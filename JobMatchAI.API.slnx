@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="JobMatchAI.Application/JobMatchAI.Application.csproj" />
+  <Project Path="JobMatchAI.Domain/JobMatchAI.Domain.csproj" />
+  <Project Path="JobMatchAI.Infrastructure.AI/JobMatchAI.Infrastructure.AI.csproj" />
+  <Project Path="JobMatchAI.Infrastructure.Data/JobMatchAI.Infrastructure.Data.csproj" />
+  <Project Path="JobMatchAI/JobMatchAI.csproj" />
+</Solution>

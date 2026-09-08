@@ -1,0 +1,99 @@
+## =======================================================================
+## .NET / Visual Studio / Rider / C#
+## =======================================================================
+
+# Build results
+[Dd]ebug/
+[Dd]ebug-public/
+[Rr]elease/
+[Rr]elease-public/
+x64/
+x86/
+[Aa]rm/
+[Aa]rm64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Lls]og/
+[Lls]ogs/
+
+# Visual Studio files
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.userprefs
+
+# JetBrains Rider / Resharper
+.idea/
+*.sln.iml
+_ReSharper*/
+*.ReSharper
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# EF Core / Database Migration artifacts & secrets
+appsettings.Development.json
+appsettings.Local.json
+*.db
+*.sqlite
+*.sqlite3
+
+# BenchmarkDotNet output
+BenchmarkDotNet.Artifacts/
+
+# NTest / Coverage reports
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+## =======================================================================
+## Node.js / Frontend (if applicable)
+## =======================================================================
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+dist/
+build/
+.next/
+
+## =======================================================================
+## Operating System Files
+## =======================================================================
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+.fuse_hidden*
+.directory
