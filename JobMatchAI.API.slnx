@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+  </Folder>
   <Project Path="JobMatchAI.Application/JobMatchAI.Application.csproj" />
   <Project Path="JobMatchAI.Domain/JobMatchAI.Domain.csproj" />
   <Project Path="JobMatchAI.Infrastructure.AI/JobMatchAI.Infrastructure.AI.csproj" />
