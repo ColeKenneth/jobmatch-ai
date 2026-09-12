@@ -6,5 +6,6 @@
   <Project Path="JobMatchAI.Domain/JobMatchAI.Domain.csproj" />
   <Project Path="JobMatchAI.Infrastructure.AI/JobMatchAI.Infrastructure.AI.csproj" />
   <Project Path="JobMatchAI.Infrastructure.Data/JobMatchAI.Infrastructure.Data.csproj" />
+  <Project Path="JobMatchAI.Tests/JobMatchAI.Tests.csproj" Id="e4fd6d0e-6e8c-4d34-a6dd-5b0017aed0a7" />
   <Project Path="JobMatchAI/JobMatchAI.csproj" />
 </Solution>

@@ -6,4 +6,11 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\JobMatchAI.Application\JobMatchAI.Application.csproj" />
+    <ProjectReference Include="..\JobMatchAI.Domain\JobMatchAI.Domain.csproj" />
+    <ProjectReference Include="..\JobMatchAI.Infrastructure.AI\JobMatchAI.Infrastructure.AI.csproj" />
+    <ProjectReference Include="..\JobMatchAI.Infrastructure.Data\JobMatchAI.Infrastructure.Data.csproj" />
+  </ItemGroup>
+
 </Project>

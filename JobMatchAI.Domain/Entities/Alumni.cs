@@ -31,7 +31,7 @@ namespace JobMatchAI.Domain.Entities
         [Column("current_position", TypeName = "varchar(50)")]
         public string? CurrentPosition { get; set; }
 
-        // public virtual ICollection<EmploymentHistory> EmploymentHistory { get; set; } = [];
+        public virtual ICollection<EmploymentHistory> EmploymentHistory { get; set; } = [];
         public virtual ICollection<Skill> Skills { get; set; } = [];
     }
 }
