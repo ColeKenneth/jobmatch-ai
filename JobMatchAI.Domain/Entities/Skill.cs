@@ -21,15 +21,15 @@ namespace JobMatchAI.Domain.Entities
         public Category Category { get; set; }
 
         [Column("ontology_id")]
-        public Guid OntologyId { get; set; } = Guid.NewGuid();
+        public string? OntologyId { get; set; }
 
         [Column("description", TypeName = "text")]
         public string? Description { get; set; }
 
-        [Column("icon_url", TypeName = "varchar(50)")]
+        [Column("icon_url", TypeName = "varchar(500)")]
         public string? IconUrl { get; set; }
 
-        public virtual ICollection<Student> Students { get; set; } = [];
+        public virtual ICollection<StudentSkill> StudentSkills { get; set; } = [];
         public virtual ICollection<JobSkill> JobSkills { get; set; } = [];
     }
 }

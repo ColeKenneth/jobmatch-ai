@@ -17,7 +17,10 @@ namespace JobMatchAI.Domain.Enums
         Employer = 3,
 
         [Display(Name = "Admin")]
-        Admin = 4
+        Admin = 4,
+
+        [Display(Name = "Placement Officer")]
+        PlacementOfficer = 5
         
     }
     

@@ -38,7 +38,7 @@ namespace JobMatchAI.Domain.Entities
         [Column("resume_text", TypeName = "text")]
         public string? ResumeText { get; set; }
 
-        public virtual ICollection<Skill> Skills { get; set; } = [];
+        public virtual ICollection<StudentSkill> StudentSkills { get; set; } = [];
         public virtual ICollection<MatchResult> MatchResults { get; set; } = [];
     }
 }

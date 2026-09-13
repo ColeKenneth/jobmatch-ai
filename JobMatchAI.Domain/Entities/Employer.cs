@@ -25,13 +25,13 @@ namespace JobMatchAI.Domain.Entities
         [Column("industry", TypeName = "varchar(80)")]
         public string Industry { get; set; } = string.Empty;
 
-        [Column("website", TypeName = "varchar(50)")]
+        [Column("website", TypeName = "varchar(500)")]
         public string? Website { get; set; }
 
         [Column("company_description", TypeName = "text")]
         public string? CompanyDescription { get; set; }
 
-        [Column("logo_url", TypeName = "varchar(50)")]
+        [Column("logo_url", TypeName = "varchar(500)")]
         public string? LogoUrl { get; set; }
 
         public virtual ICollection<JobPosting> JobPostings { get; set; } = [];

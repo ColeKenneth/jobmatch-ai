@@ -35,10 +35,10 @@ namespace JobMatchAI.Domain.Entities
         [Column("min_experience_years", TypeName = "int")]
         public int MinExperienceYears { get; set; }
 
-        [Column("min_salary", TypeName = "decimal(5,2)")]
+        [Column("min_salary", TypeName = "decimal(9,2)")]
         public decimal? MinSalary { get; set; }
 
-        [Column("max_salary", TypeName = "decimal(5,2)")]
+        [Column("max_salary", TypeName = "decimal(9,2)")]
         public decimal? MaxSalary { get; set; }
 
         [Column("location", TypeName = "varchar(100)")]

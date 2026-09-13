@@ -22,14 +22,17 @@ namespace JobMatchAI.Domain.Entities
         [Column("program", TypeName = "varchar(30)")]
         public string Program { get; set; } = string.Empty;
 
-        [Column("graduation_year")]
-        public DateOnly GraduationYear { get; set; }
+        [Column("graduation_year", TypeName = "date")]
+        public DateOnly GraduationDate { get; set; }
 
         [Column("current_employer", TypeName = "varchar(100)")]
         public string? CurrentEmployer { get; set; }
 
         [Column("current_position", TypeName = "varchar(50)")]
         public string? CurrentPosition { get; set; }
+
+        [NotMapped]
+        public int GetGraduationYear => GraduationDate.Year;
 
         public virtual ICollection<EmploymentHistory> EmploymentHistory { get; set; } = [];
         public virtual ICollection<Skill> Skills { get; set; } = [];

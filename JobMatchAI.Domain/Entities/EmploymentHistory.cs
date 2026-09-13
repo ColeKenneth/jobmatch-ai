@@ -34,7 +34,7 @@ namespace JobMatchAI.Domain.Entities
         [Column("is_current", TypeName = "boolean")]
         public bool IsCurrent { get; set; }
 
-        [Column("responsibilities", TypeName = "varchar(200)")]
+        [Column("responsibilities", TypeName = "text")]
         public string? Responsibilities { get; set; }
     }
 }
