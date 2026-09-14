@@ -31,7 +31,7 @@ namespace JobMatchAI.Domain.Entities
         [Column("expiry_date", TypeName = "timestamp")]
         public DateTime? ExpiryDate { get; set; }
 
-        [Column("verification_url", TypeName = "varchar(100)")]
+        [Column("verification_url", TypeName = "varchar(500)")]
         public string? VerificationUrl { get; set; }
 
         [Column("credential_id", TypeName = "varchar(50)")]
