@@ -10,7 +10,7 @@ namespace JobMatchAI.Application.DTOs
         [Range(minimum: 0.00, maximum: 100.00, ErrorMessage = "Matching score is between 0% to 100%.")]
         public double MatchScore { get; init; }
 
-        // public IReadOnlyList<FeatureContribution> FeatureContributions { get; init; } = [];
+        public IReadOnlyList<FeatureContribution> FeatureContributions { get; init; } = [];
 
         public string Summary { get; init; } = string.Empty;
 
