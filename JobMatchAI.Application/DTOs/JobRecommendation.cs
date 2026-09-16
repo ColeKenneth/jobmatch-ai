@@ -8,7 +8,6 @@ namespace JobMatchAI.Application.DTOs
 {
     public record JobRecommendation
     {
-        private readonly DateTime _recommendationDate;
         public Guid JobId { get; init; }
 
         [Required(ErrorMessage = "Job title is required.")]

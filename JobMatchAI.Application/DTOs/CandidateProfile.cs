@@ -1,4 +1,5 @@
-﻿using JobMatchAI.Domain.Entities;
+﻿using JobMatchAI.Application.Attributes;
+using JobMatchAI.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -19,7 +20,7 @@ namespace JobMatchAI.Application.DTOs
         [StringLength(maximumLength: 100, ErrorMessage = "Program name cannot exceed 100 characters.")]
         public string Program { get; init; } = string.Empty;
 
-        [Required(ErrorMessage = "Your GWA is required.")]
+        [NonNegativeNumber]
         [Range(typeof(decimal), "1.00", "5.00", ErrorMessage = "GWA must be between 1.00 and 5.00")]
         public decimal Gwa { get; init; }
 
