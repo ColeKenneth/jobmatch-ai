@@ -6,11 +6,11 @@ using System.Text;
 namespace JobMatchAI.Application.Attributes
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-    public sealed class FutureDateAttribute : ValidationAttribute 
+    public sealed class PastOrPresentAttribute : ValidationAttribute
     {
-        public FutureDateAttribute()
+        public PastOrPresentAttribute()
         {
-            ErrorMessage = "{0} cannot happen in the past.";
+            ErrorMessage = "{0} cannot be a future date.";
         }
 
         public override bool IsValid(object? value)
@@ -19,8 +19,8 @@ namespace JobMatchAI.Application.Attributes
 
             return value switch
             {
-                DateTime dt => dt.ToUniversalTime() >= DateTime.UtcNow,
-                DateTimeOffset dto => dto.UtcDateTime >= DateTime.UtcNow,
+                DateTime dt => dt.ToUniversalTime() <= DateTime.UtcNow,
+                DateTimeOffset dto => dto.UtcDateTime <= DateTime.UtcNow,
                 _ => false
             };
         }

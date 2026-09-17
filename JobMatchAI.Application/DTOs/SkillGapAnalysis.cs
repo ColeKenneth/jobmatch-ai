@@ -9,9 +9,9 @@ namespace JobMatchAI.Application.DTOs
     {
         public IReadOnlyList<string> MatchedSkills { get; init; } = [];
         public IReadOnlyList<string> MissingRequiredSkills { get; init; } = [];
-        public IReadOnlyList<string> MissingPreferrredSkills { get; init; } = [];
+        public IReadOnlyList<string> MissingPreferredSkills { get; init; } = [];
 
-        [Range(minimum: 0.00, maximum: 100.00, ErrorMessage = "Match percentage must only between 0 and 100%.")]
+        [Range(0.00, 100.00, ErrorMessage = "Match percentage must only between 0 and 100%.")]
         public double MatchPercentage { get; init; }
 
         public IReadOnlyList<SkillDevelopmentSuggestion> Suggestions { get; init; } = [];

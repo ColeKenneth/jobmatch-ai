@@ -9,11 +9,11 @@ namespace JobMatchAI.Application.DTOs
     {
         public Guid StudentId { get; init; }
 
-        [Range(minimum: 0.00, maximum: 100.00, ErrorMessage = "Employability score is between 0% and 100%.")]
+        [Range(0.00, 100.00, ErrorMessage = "Employability score is between 0% and 100%.")]
         public double EmployabilityScore { get; init; }
 
         [Required(ErrorMessage = "Employability level is required.")]
-        [StringLength(maximumLength: 100, ErrorMessage = "Employability level cannot exceed 100 characters.")]
+        [StringLength(100, ErrorMessage = "Employability level cannot exceed 100 characters.")]
         public string EmployabilityLevel { get; init; } = string.Empty;
 
         public IReadOnlyList<string> Strengths { get; init; } = [];
@@ -24,6 +24,6 @@ namespace JobMatchAI.Application.DTOs
 
         public IReadOnlyList<string> RecommendedCourses { get; init; } = [];
 
-        public IReadOnlyDictionary<string, double> FeatureImportance = new Dictionary<string, double>();
+        public IReadOnlyDictionary<string, double> FeatureImportance { get; init; } = new Dictionary<string, double>();
     }
 }

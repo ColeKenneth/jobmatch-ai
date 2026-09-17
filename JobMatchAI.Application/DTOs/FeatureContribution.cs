@@ -8,13 +8,13 @@ namespace JobMatchAI.Application.DTOs
     public record FeatureContribution
     {
         [Required(ErrorMessage = "Feature name is required.")]
-        [StringLength(maximumLength: 200, ErrorMessage = "Feature name cannot exceed 200 characters.")]
+        [StringLength(200, ErrorMessage = "Feature name cannot exceed 200 characters.")]
         public string FeatureName { get; init; } = string.Empty;
 
-        [Range(minimum: 1, maximum: 100, ErrorMessage = "Value is only between 1 and 100.")]
+        [Range(-100.00, 100.00, ErrorMessage = "Value must be between -100 and 100.")]
         public double Value { get; init; }
 
-        [Range(minimum: 1, maximum: 5, ErrorMessage = "Importance must be rated from 1 to 5 only.")]
+        [Range(0.0, 1.0, ErrorMessage = "Importance is only between 0.0 and 1.0")]
         public double Importance { get; init; }
 
         [Required(ErrorMessage = "Impact is required.")]

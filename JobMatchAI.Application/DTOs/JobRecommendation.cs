@@ -11,25 +11,25 @@ namespace JobMatchAI.Application.DTOs
         public Guid JobId { get; init; }
 
         [Required(ErrorMessage = "Job title is required.")]
-        [StringLength(maximumLength: 50, ErrorMessage = "Job title cannot exceed 50 characters.")]
+        [StringLength(50, ErrorMessage = "Job title cannot exceed 50 characters.")]
         public string Title { get; init; } = string.Empty;
 
         [Required(ErrorMessage = "Company name is required.")]
-        [StringLength(maximumLength: 100, ErrorMessage = "Company name cannot exceed 100 characters.")]
+        [StringLength(100, ErrorMessage = "Company name cannot exceed 100 characters.")]
         public string CompanyName { get; init; } = string.Empty;
 
         [Required(ErrorMessage = "Location is required.")]
-        [StringLength(maximumLength: 100, ErrorMessage = "Location cannot exceed 100 characters.")]
+        [StringLength(100, ErrorMessage = "Location cannot exceed 100 characters.")]
         public string Location { get; init; } = string.Empty;
 
-        [Range(minimum: 0.00, maximum: 100.00, ErrorMessage = "Match score is only between 0% and 100%.")]
+        [Range(0.00, 100.00, ErrorMessage = "Match score is only between 0% and 100%.")]
         public double MatchScore { get; init; }
 
-        public required SkillGapAnalysis SkillsGap { get; init; }
+        public SkillGapAnalysis SkillsGap { get; init; } = new();
 
-        public required XaiExplanation Explanation { get; init; }
+        public XaiExplanation Explanation { get; init; } = new();
 
-        [FutureDate(ErrorMessage = "Recommendation date cannot happen in the past.")]
+        [PastOrPresent(ErrorMessage = "Recommendation date cannot happen in the future.")]
         public DateTime RecommendationDate { get; init; }
     }
 }

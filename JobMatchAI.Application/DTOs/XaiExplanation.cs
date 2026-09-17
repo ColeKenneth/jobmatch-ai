@@ -7,16 +7,16 @@ namespace JobMatchAI.Application.DTOs
 {
     public record XaiExplanation
     {
-        [Range(minimum: 0.00, maximum: 100.00, ErrorMessage = "Matching score is between 0% to 100%.")]
+        [Range(0.00, 100.00, ErrorMessage = "Matching score is between 0% to 100%.")]
         public double MatchScore { get; init; }
 
         public IReadOnlyList<FeatureContribution> FeatureContributions { get; init; } = [];
 
         public string Summary { get; init; } = string.Empty;
 
-        public string Strengths { get; init; } = string.Empty;
+        public IReadOnlyList<string> Strengths { get; init; } = [];
 
-        public string Weaknesses { get; init; } = string.Empty;
+        public IReadOnlyList<string> Weaknesses { get; init; } = [];
 
         public IReadOnlyList<string> Recommendations { get; init; } = [];
 

@@ -10,11 +10,12 @@ namespace JobMatchAI.Application.Attributes
     {
         public NonNegativeNumberAttribute()
         {
-            ErrorMessage = $"{0} must be a non-negative number.";
+            ErrorMessage = "{0} must be a non-negative number.";
         }
 
         public override bool IsValid(object? value)
         {
+            if (value is null) return true;
             return value is >= 0;
         }
     }
