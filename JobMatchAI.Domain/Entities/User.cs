@@ -44,7 +44,6 @@ namespace JobMatchAI.Domain.Entities
 
         public virtual Student? Student { get; set; }
         public virtual Alumni? Alumni { get; set; }
-
         public virtual Employer? Employer { get; set; }
 
             

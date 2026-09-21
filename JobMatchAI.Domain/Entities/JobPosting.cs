@@ -64,5 +64,7 @@ namespace JobMatchAI.Domain.Entities
 
         public virtual ICollection<JobSkill> RequiredSkills { get; set; } = [];
         public virtual ICollection<MatchResult> MatchResults { get; set; } = [];
+
+        public virtual ICollection<PlacementRecord> PlacementRecords { get; set; } = [];
     }
 }
