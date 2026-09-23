@@ -8,6 +8,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\JobMatchAI.Domain\JobMatchAI.Domain.csproj" />
+    <ProjectReference Include="..\JobMatchAI.Infrastructure.Data\JobMatchAI.Infrastructure.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.12" />
+    <PackageReference Include="Riok.Mapperly" Version="4.3.1" />
   </ItemGroup>
 
 </Project>

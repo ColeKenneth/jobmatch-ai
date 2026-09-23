@@ -15,8 +15,8 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\JobMatchAI.Application\JobMatchAI.Application.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\JobMatchAI.Domain\JobMatchAI.Domain.csproj" />
+	</ItemGroup>
 
 </Project>
