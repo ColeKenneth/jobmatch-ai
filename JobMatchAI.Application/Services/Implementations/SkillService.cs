@@ -19,7 +19,6 @@ namespace JobMatchAI.Application.Services.Implementations
 
             var skill = new Skill
             {
-                Id = Guid.NewGuid(),
                 Name = dto.Name,
                 Category = dto.Category,
                 OntologyId = dto.OntologyId,
@@ -27,8 +26,14 @@ namespace JobMatchAI.Application.Services.Implementations
                 IconUrl = dto.IconUrl
             };
 
-            context.Skills.Add(skill);
-            await context.SaveChangesAsync();
+            try
+            {
+                await context.SaveChangesAsync();
+            } 
+            catch (DbUpdateException)
+            {
+                throw new InvalidOperationException($"Skill {dto.Name} already exists.");
+            }
 
             logger.LogInformation("Created skill {SkillId} ({Name})", skill.Id, skill.Name);
 
@@ -91,6 +96,11 @@ namespace JobMatchAI.Application.Services.Implementations
 
         public async Task UpdateAsync(Guid id, SkillDto dto)
         {
+            var exists = await context.Skills
+                .AnyAsync(s => s.Id != id && EF.Functions.ILike(s.Name, dto.Name));
+
+            if (exists) throw new InvalidOperationException($"Skill {dto.Name} already exists.");
+
             var skill = await context.Skills.FindAsync(id)
                 ?? throw new KeyNotFoundException($"Skill {id} not found.");
 
@@ -100,7 +110,14 @@ namespace JobMatchAI.Application.Services.Implementations
             skill.Description = dto.Description;
             skill.IconUrl = dto.IconUrl;
 
-            await context.SaveChangesAsync();
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                throw new InvalidOperationException($"Skill {dto.Name} already exists.");
+            }
             logger.LogInformation("Updated skill {SkillId}", skill.Id);
         }
 
