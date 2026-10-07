@@ -8,7 +8,7 @@ namespace JobMatchAI.Application.DTOs
 {
     public record UserDto
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; init; }
 
         [Required(ErrorMessage = "First name is required.")]
         [StringLength(100, ErrorMessage = "First name cannot exceed 100 characters.")]

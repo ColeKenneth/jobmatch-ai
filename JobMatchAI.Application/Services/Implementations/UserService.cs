@@ -5,6 +5,7 @@ using JobMatchAI.Domain.Exceptions;
 using JobMatchAI.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Linq.Expressions;
 
 namespace JobMatchAI.Application.Services.Implementations
 {
@@ -12,22 +13,29 @@ namespace JobMatchAI.Application.Services.Implementations
     {
         public async Task ActivateAsync(Guid id)
         {
-            var user = await context.Users.FindAsync(id)
-                ?? throw new NotFoundException($"User {id} not found.");
+            var updatedCount = await context.Users
+                .Where(u => u.Id == id && !u.IsActive)
+                .ExecuteUpdateAsync(s => s
+                .SetProperty(u => u.IsActive, true)
+                .SetProperty(u => u.UpdatedAt, DateTime.UtcNow));
 
-            if (user.IsActive) return;
+            if (updatedCount == 0)
+            {
+                var exists = await context.Users.AnyAsync(u => u.Id == id);
+                if (!exists) throw new NotFoundException($"User {id} not found.");
 
-            user.IsActive = true;
-            user.UpdatedAt = DateTime.UtcNow;
+                return;
+            }
 
-            await context.SaveChangesAsync();
             logger.LogInformation("Activated user {Id}", id);
         }
 
         public async Task<UserDto> CreateAsync(UserDto dto)
         {
+            var normalizedEmail = dto.Email.Trim().ToLowerInvariant();
+
             var exists = await context.Users
-                .AnyAsync(u => u.Email == dto.Email);
+                .AnyAsync(u => u.Email == normalizedEmail);
 
             if (exists) throw new AlreadyExistsException($"User {dto.Email} already exists.");
 
@@ -36,7 +44,7 @@ namespace JobMatchAI.Application.Services.Implementations
                 FirstName = dto.FirstName,
                 MiddleName = dto.MiddleName,
                 LastName = dto.LastName,
-                Email = dto.Email,
+                Email = normalizedEmail,
                 Role = dto.Role,
                 CreatedAt = DateTime.UtcNow,
                 IsActive = dto.IsActive
@@ -48,8 +56,9 @@ namespace JobMatchAI.Application.Services.Implementations
             {
                 await context.SaveChangesAsync();
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
+                logger.LogError(ex, "Error creating user {Email}", dto.Email);
                 throw new AlreadyExistsException($"User {dto.Email} already exists.");
             }
 
@@ -59,31 +68,38 @@ namespace JobMatchAI.Application.Services.Implementations
 
         public async Task DeactivateAsync(Guid id)
         {
-            var user = await context.Users.FindAsync(id)
-                ?? throw new NotFoundException($"User {id} not found.");
+            var updatedCount = await context.Users
+                .Where(u => u.Id == id && u.IsActive)
+                .ExecuteUpdateAsync(s => s
+                .SetProperty(u => u.IsActive, false)
+                .SetProperty(u => u.UpdatedAt, DateTime.UtcNow));
 
-            if (!user.IsActive) return;
+            if (updatedCount == 0)
+            {
+                var exists = await context.Users.AnyAsync(u => u.Id == id);
+                if (!exists) throw new NotFoundException($"User {id} not found.");
 
-            user.IsActive = false;
-            user.UpdatedAt = DateTime.UtcNow;
+                return;
+            }
 
-            await context.SaveChangesAsync();
             logger.LogInformation("Deactivated user {Id}", id);
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            var user = await context.Users.FindAsync(id)
-                ?? throw new NotFoundException($"User {id} not found.");
+            var deletedCount = await context.Users
+                .Where(u => u.Id == id)
+                .ExecuteDeleteAsync();
 
-            context.Users.Remove(user);
-            await context.SaveChangesAsync();
-            logger.LogInformation("Deleted user {Id}", user.Id);
+            if (deletedCount == 0) throw new NotFoundException($"User {id} not found.");
+
+            logger.LogInformation("Deleted user {Id}", id);
         }
 
         public async Task<bool> EmailExistsAsync(string email)
         {
-            return await context.Users.AnyAsync(u => u.Email == email);
+            var normalizedEmail = email.Trim().ToLowerInvariant();
+            return await context.Users.AnyAsync(u => u.Email == normalizedEmail);
         }
 
         public async Task<bool> ExistsAsync(Guid id)
@@ -93,36 +109,39 @@ namespace JobMatchAI.Application.Services.Implementations
 
         public async Task<IEnumerable<UserDto>> GetAllAsync()
         {
-            var users = await context.Users
-                .AsNoTracking()
-                .OrderBy(u => u.LastName)
-                .ToListAsync();
-
-            return users.Select(MapToDto);
+            return await context.Users
+                 .AsNoTracking()
+                 .OrderBy(u => u.LastName)
+                 .Select(AsUserDto )
+                 .ToListAsync();
         }
 
         public async Task<UserDto?> GetByEmailAsync(string email)
         {
-            var user = await context.Users
-                .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Email == email);
+            var normalizedEmail = email.Trim().ToLowerInvariant();
 
-            return user is null ? null : MapToDto(user);
+            return await context.Users
+                .AsNoTracking()
+                .Where(u => u.Email == normalizedEmail)
+                .Select(AsUserDto)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<UserDto?> GetByIdAsync(Guid id)
         {
-            var user = await context.Users
+            return await context.Users
                 .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Id == id);
-
-            return user is null ? null : MapToDto(user);
+                .Where(u => u.Id == id)
+                .Select(AsUserDto)
+                .FirstOrDefaultAsync();
         }
 
         public async Task UpdateAsync(Guid id, UserDto dto)
         {
+            var normalizedEmail = dto.Email.Trim().ToLowerInvariant();
+
             var exists = await context.Users
-                .AnyAsync(u => u.Id != id && u.Email == dto.Email);
+                .AnyAsync(u => u.Id != id && u.Email == normalizedEmail);
 
             if (exists) throw new AlreadyExistsException($"User {dto.Email} already exists.");
 
@@ -132,7 +151,7 @@ namespace JobMatchAI.Application.Services.Implementations
             user.FirstName = dto.FirstName;
             user.MiddleName = dto.MiddleName;
             user.LastName = dto.LastName;
-            user.Email = dto.Email;
+            user.Email = normalizedEmail;
             user.Role = dto.Role;
             user.IsActive = dto.IsActive;
 
@@ -144,22 +163,25 @@ namespace JobMatchAI.Application.Services.Implementations
             }
             catch (DbUpdateException)
             {
+                logger.LogError("Error updating user {Email}", dto.Email);
                 throw new AlreadyExistsException($"User {dto.Email} already exists.");
             }
 
             logger.LogInformation("Updated user {Email}", user.Email);
         }
 
-        private static UserDto MapToDto(User user) => new()
+        private static readonly Expression<Func<User, UserDto>> AsUserDto = u => new UserDto
         {
-            Id = user.Id,
-            FirstName = user.FirstName,
-            MiddleName = user.MiddleName ?? "",
-            LastName = user.LastName,
-            Email = user.Email,
-            Role = user.Role,
-            CreatedAt = user.CreatedAt,
-            IsActive = user.IsActive
+            Id = u.Id,
+            FirstName = u.FirstName,
+            MiddleName = u.MiddleName ?? "",
+            LastName = u.LastName,
+            Email = u.Email,
+            Role = u.Role,
+            CreatedAt = u.CreatedAt,
+            IsActive = u.IsActive
         };
+
+        private static readonly Func<User, UserDto> MapToDto = AsUserDto.Compile();
     }
 }

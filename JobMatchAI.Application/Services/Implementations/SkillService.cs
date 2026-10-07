@@ -2,9 +2,11 @@
 using JobMatchAI.Application.Services.Interfaces;
 using JobMatchAI.Domain.Entities;
 using JobMatchAI.Domain.Enums;
+using JobMatchAI.Domain.Exceptions;
 using JobMatchAI.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Linq.Expressions;
 
 namespace JobMatchAI.Application.Services.Implementations
 {
@@ -15,7 +17,7 @@ namespace JobMatchAI.Application.Services.Implementations
             var exists = await context.Skills
                 .AnyAsync(s => EF.Functions.ILike(s.Name, dto.Name));
 
-            if (exists) throw new InvalidOperationException($"Skill {dto.Name} already exists.");
+            if (exists) throw new AlreadyExistsException($"Skill {dto.Name} already exists.");
 
             var skill = new Skill
             {
@@ -26,28 +28,31 @@ namespace JobMatchAI.Application.Services.Implementations
                 IconUrl = dto.IconUrl
             };
 
+            context.Skills.Add(skill);
+
             try
             {
                 await context.SaveChangesAsync();
             } 
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
-                throw new InvalidOperationException($"Skill {dto.Name} already exists.");
+                logger.LogError(ex, "Error creating skill {Name}", dto.Name);
+                throw new AlreadyExistsException($"Skill {dto.Name} already exists.");
             }
 
             logger.LogInformation("Created skill {SkillId} ({Name})", skill.Id, skill.Name);
-
             return MapToDto(skill);
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            var skill = await context.Skills.FindAsync(id)
-                ?? throw new KeyNotFoundException($"Skill {id} not found.");
+            var deletedCount = await context.Skills
+                .Where(s => s.Id == id)
+                .ExecuteDeleteAsync();
 
-            context.Skills.Remove(skill);
-            await context.SaveChangesAsync();
-            logger.LogInformation("Deleted skill with an ID of {SkillId}", skill.Id);
+            if (deletedCount == 0) throw new NotFoundException($"Skill {id} not found.");
+
+            logger.LogInformation("Deleted skill with an ID of {SkillId}", id);
         }
 
         public async Task<bool> ExistsAsync(Guid id)
@@ -57,41 +62,40 @@ namespace JobMatchAI.Application.Services.Implementations
 
         public async Task<IEnumerable<SkillDto>> GetAllAsync()
         {
-            var skills = await context.Skills
+            return await context.Skills
                 .AsNoTracking()
                 .OrderBy(s => s.Name)
+                .Select(AsSkillDto)
                 .ToListAsync();
-
-            return skills.Select(MapToDto);
         }
 
         public async Task<IEnumerable<SkillDto>> GetByCategoryAsync(Category category)
         {
-            var skills = await context.Skills
+            return await context.Skills
                 .AsNoTracking()
                 .Where(s => s.Category == category)
                 .OrderBy(s => s.Name)
+                .Select(AsSkillDto)
                 .ToListAsync();
-
-            return skills.Select(MapToDto);
         }
 
         public async Task<SkillDto?> GetByIdAsync(Guid id)
         {
-            var skill = await context.Skills
+            return await context.Skills
                 .AsNoTracking()
-                .FirstOrDefaultAsync(s => s.Id == id);
-
-            return skill is null ? null : MapToDto(skill);
+                .Where(s => s.Id == id)
+                .Select(AsSkillDto)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<SkillDto?> GetByNameAsync(string name)
         {
-            var skill = await context.Skills
+            return await context.Skills
                 .AsNoTracking()
-                .FirstOrDefaultAsync(s => EF.Functions.ILike(s.Name, name));
-
-            return skill is null ? null : MapToDto(skill);
+                .Where(s => EF.Functions.ILike(s.Name, name))
+                .Select(AsSkillDto)
+                .FirstOrDefaultAsync();
+                
         }
 
         public async Task UpdateAsync(Guid id, SkillDto dto)
@@ -99,10 +103,10 @@ namespace JobMatchAI.Application.Services.Implementations
             var exists = await context.Skills
                 .AnyAsync(s => s.Id != id && EF.Functions.ILike(s.Name, dto.Name));
 
-            if (exists) throw new InvalidOperationException($"Skill {dto.Name} already exists.");
+            if (exists) throw new AlreadyExistsException($"Skill {dto.Name} already exists.");
 
             var skill = await context.Skills.FindAsync(id)
-                ?? throw new KeyNotFoundException($"Skill {id} not found.");
+                ?? throw new NotFoundException($"Skill {id} not found.");
 
             skill.Name = dto.Name;
             skill.Category = dto.Category;
@@ -114,21 +118,25 @@ namespace JobMatchAI.Application.Services.Implementations
             {
                 await context.SaveChangesAsync();
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
-                throw new InvalidOperationException($"Skill {dto.Name} already exists.");
+                logger.LogError(ex, "Error updating skill {SkillId}", id);
+                throw new AlreadyExistsException($"Skill {dto.Name} already exists.");
             }
+
             logger.LogInformation("Updated skill {SkillId}", skill.Id);
         }
 
-        private static SkillDto MapToDto(Skill skill) => new()
+        private static readonly Expression<Func<Skill, SkillDto>> AsSkillDto = s => new SkillDto
         {
-            Id = skill.Id,
-            Name = skill.Name,
-            Category = skill.Category,
-            OntologyId = skill.OntologyId,
-            Description = skill.Description,
-            IconUrl = skill.IconUrl
+            Id = s.Id,
+            Name = s.Name,
+            Category = s.Category,
+            OntologyId = s.OntologyId,
+            Description = s.Description,
+            IconUrl = s.IconUrl
         };
+
+        private static readonly Func<Skill, SkillDto> MapToDto = AsSkillDto.Compile();
     }
 }
