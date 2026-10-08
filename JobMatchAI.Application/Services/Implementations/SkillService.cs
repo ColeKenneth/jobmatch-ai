@@ -15,17 +15,17 @@ namespace JobMatchAI.Application.Services.Implementations
         public async Task<SkillDto> CreateAsync(SkillDto dto)
         {
             var exists = await context.Skills
-                .AnyAsync(s => EF.Functions.ILike(s.Name, dto.Name));
+                .AnyAsync(s => EF.Functions.ILike(s.Name, dto.Name.Trim()));
 
             if (exists) throw new AlreadyExistsException($"Skill {dto.Name} already exists.");
 
             var skill = new Skill
             {
-                Name = dto.Name,
+                Name = dto.Name.Trim(),
                 Category = dto.Category,
-                OntologyId = dto.OntologyId,
-                Description = dto.Description,
-                IconUrl = dto.IconUrl
+                OntologyId = dto.OntologyId?.Trim(),
+                Description = dto.Description?.Trim(),
+                IconUrl = dto.IconUrl?.Trim()
             };
 
             context.Skills.Add(skill);
@@ -92,7 +92,7 @@ namespace JobMatchAI.Application.Services.Implementations
         {
             return await context.Skills
                 .AsNoTracking()
-                .Where(s => EF.Functions.ILike(s.Name, name))
+                .Where(s => EF.Functions.ILike(s.Name, name.Trim()))
                 .Select(AsSkillDto)
                 .FirstOrDefaultAsync();
                 
@@ -101,18 +101,18 @@ namespace JobMatchAI.Application.Services.Implementations
         public async Task UpdateAsync(Guid id, SkillDto dto)
         {
             var exists = await context.Skills
-                .AnyAsync(s => s.Id != id && EF.Functions.ILike(s.Name, dto.Name));
+                .AnyAsync(s => s.Id != id && EF.Functions.ILike(s.Name, dto.Name.Trim()));
 
             if (exists) throw new AlreadyExistsException($"Skill {dto.Name} already exists.");
 
             var skill = await context.Skills.FindAsync(id)
                 ?? throw new NotFoundException($"Skill {id} not found.");
 
-            skill.Name = dto.Name;
+            skill.Name = dto.Name.Trim();
             skill.Category = dto.Category;
-            skill.OntologyId = dto.OntologyId;
-            skill.Description = dto.Description;
-            skill.IconUrl = dto.IconUrl;
+            skill.OntologyId = dto.OntologyId?.Trim();
+            skill.Description = dto.Description?.Trim();
+            skill.IconUrl = dto.IconUrl?.Trim();
 
             try
             {

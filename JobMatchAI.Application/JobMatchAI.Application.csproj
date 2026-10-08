@@ -7,6 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\Interfaces\**" />
+    <EmbeddedResource Remove="Services\Interfaces\**" />
+    <None Remove="Services\Interfaces\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Services\Interfaces\IEmployerService.cs" />
+    <Compile Include="Services\Interfaces\IJobPostingService.cs" />
+    <Compile Include="Services\Interfaces\ISkillService.cs" />
+    <Compile Include="Services\Interfaces\IStudentService.cs" />
+    <Compile Include="Services\Interfaces\IUserService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\JobMatchAI.Domain\JobMatchAI.Domain.csproj" />
     <ProjectReference Include="..\JobMatchAI.Infrastructure.Data\JobMatchAI.Infrastructure.Data.csproj" />
   </ItemGroup>

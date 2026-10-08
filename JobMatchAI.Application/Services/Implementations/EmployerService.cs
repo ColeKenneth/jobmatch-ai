@@ -35,10 +35,10 @@ namespace JobMatchAI.Application.Services.Implementations
             {
                 UserId = dto.UserId,
                 CompanyName = dto.CompanyName.Trim(),
-                Industry = dto.Industry,
-                Website = dto.Website,
-                CompanyDescription = dto.CompanyDescription,
-                LogoUrl = dto.LogoUrl
+                Industry = dto.Industry.Trim(),
+                Website = dto.Website?.Trim(),
+                CompanyDescription = dto.CompanyDescription?.Trim(),
+                LogoUrl = dto.LogoUrl?.Trim()
             };
 
             context.Employers.Add(employer);
@@ -110,10 +110,10 @@ namespace JobMatchAI.Application.Services.Implementations
                 ?? throw new NotFoundException($"Employer {id} not found.");
 
             employer.CompanyName = dto.CompanyName.Trim();
-            employer.Industry = dto.Industry;
-            employer.Website = dto.Website;
-            employer.CompanyDescription = dto.CompanyDescription;
-            employer.LogoUrl = dto.LogoUrl;
+            employer.Industry = dto.Industry.Trim();
+            employer.Website = dto.Website?.Trim();
+            employer.CompanyDescription = dto.CompanyDescription?.Trim();
+            employer.LogoUrl = dto.LogoUrl?.Trim();
 
             try
             {

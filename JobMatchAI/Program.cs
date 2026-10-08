@@ -8,6 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddScoped<ISkillService, SkillService>();
+builder.Services.AddScoped<IEmployerService, EmployerService>();
+builder.Services.AddScoped<IJobPostingService, JobPostingService>();
+builder.Services.AddScoped<IJobSkillService, JobSkillService>();
+builder.Services.AddScoped<IStudentService, StudentService>();
+builder.Services.AddScoped<IStudentSkillService, StudentSkillService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

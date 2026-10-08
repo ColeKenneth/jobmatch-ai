@@ -42,9 +42,9 @@ namespace JobMatchAI.Application.Services.Implementations
             {
                 EmployerId = dto.EmployerId,
                 Title = dto.Title.Trim(),
-                Description = dto.Description,
-                Requirements = dto.Requirements,
-                PreferredSkills = dto.PreferredSkills,
+                Description = dto.Description.Trim(),
+                Requirements = dto.Requirements.Trim(),
+                PreferredSkills = dto.PreferredSkills?.Trim(),
                 MinExperienceYears = dto.MinExperienceYears,
                 MinSalary = dto.MinSalary,
                 MaxSalary = dto.MaxSalary,
@@ -122,7 +122,6 @@ namespace JobMatchAI.Application.Services.Implementations
             return await context.JobPostings
                 .AsNoTracking()
                 .Where(jp => jp.Id == id)
-                .OrderByDescending(jp => jp.PostedDate)
                 .Select(AsJobPostingDto)
                 .FirstOrDefaultAsync();
         }
@@ -141,18 +140,22 @@ namespace JobMatchAI.Application.Services.Implementations
 
         public async Task IncrementApplicationsAsync(Guid id)
         {
-            await context.JobPostings
+            var updatedCount = await context.JobPostings
                 .Where(jp => jp.Id == id)
                 .ExecuteUpdateAsync(s => s
                 .SetProperty(jp => jp.Applications, jp => jp.Applications + 1));
+
+            if (updatedCount == 0) throw new NotFoundException($"Job posting {id} not found.");
         }
 
         public async Task IncrementViewsAsync(Guid id)
         {
-            await context.JobPostings
+            var updatedCount = await context.JobPostings
                 .Where(jp => jp.Id == id)
                 .ExecuteUpdateAsync(s => s
                 .SetProperty(jp => jp.Views, jp => jp.Views + 1));
+
+            if (updatedCount == 0) throw new NotFoundException($"Job posting {id} not found.");
         }
 
         public async Task ReopenAsync(Guid id)
@@ -183,9 +186,9 @@ namespace JobMatchAI.Application.Services.Implementations
                 ?? throw new NotFoundException($"Job posting {id} not found.");
 
             jobPosting.Title = dto.Title.Trim();
-            jobPosting.Description = dto.Description;
-            jobPosting.Requirements = dto.Requirements;
-            jobPosting.PreferredSkills = dto.PreferredSkills;
+            jobPosting.Description = dto.Description.Trim();
+            jobPosting.Requirements = dto.Requirements.Trim();
+            jobPosting.PreferredSkills = dto.PreferredSkills?.Trim();
             jobPosting.MinExperienceYears = dto.MinExperienceYears;
             jobPosting.MinSalary = dto.MinSalary;
             jobPosting.MaxSalary = dto.MaxSalary;

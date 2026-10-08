@@ -39,12 +39,12 @@ namespace JobMatchAI.Application.Services.Implementations
             {
                 UserId = dto.UserId,
                 StudentIdNumber = normalizedStudentIdNumber,
-                Program = dto.Program,
+                Program = dto.Program.Trim(),
                 YearLevel = dto.YearLevel,
                 Gwa = dto.Gwa,
                 GraduationDate = dto.GraduationDate,
-                ResumeFilePath = dto.ResumeFilePath,
-                ResumeText = dto.ResumeText
+                ResumeFilePath = dto.ResumeFilePath?.Trim(),
+                ResumeText = dto.ResumeText?.Trim()
             };
 
             context.Students.Add(student);
@@ -135,6 +135,11 @@ namespace JobMatchAI.Application.Services.Implementations
             var student = await context.Students.FindAsync(id)
                 ?? throw new NotFoundException($"Student {id} not found.");
 
+            if (student.UserId != dto.UserId)
+            {
+                throw new BusinessRuleException($"Student ownership {student.UserId} cannot be reassigned.");
+            }
+
             student.StudentIdNumber = normalizedStudentIdNumber;
             student.Program = dto.Program;
             student.YearLevel = dto.YearLevel;
@@ -161,8 +166,8 @@ namespace JobMatchAI.Application.Services.Implementations
             var updatedCount = await context.Students
                 .Where(s => s.Id == id)
                 .ExecuteUpdateAsync(s => s
-                .SetProperty(st => st.ResumeFilePath, filePath)
-                .SetProperty(st => st.ResumeText, resumeText));
+                .SetProperty(st => st.ResumeFilePath, filePath.Trim())
+                .SetProperty(st => st.ResumeText, resumeText.Trim()));
 
             if (updatedCount == 0) throw new NotFoundException($"Student {id} not found.");
 

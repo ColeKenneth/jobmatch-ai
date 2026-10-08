@@ -41,9 +41,9 @@ namespace JobMatchAI.Application.Services.Implementations
 
             var user = new User
             { 
-                FirstName = dto.FirstName,
-                MiddleName = dto.MiddleName,
-                LastName = dto.LastName,
+                FirstName = dto.FirstName.Trim(),
+                MiddleName = dto.MiddleName?.Trim(),
+                LastName = dto.LastName.Trim(),
                 Email = normalizedEmail,
                 Role = dto.Role,
                 CreatedAt = DateTime.UtcNow,
@@ -112,7 +112,7 @@ namespace JobMatchAI.Application.Services.Implementations
             return await context.Users
                  .AsNoTracking()
                  .OrderBy(u => u.LastName)
-                 .Select(AsUserDto )
+                 .Select(AsUserDto)
                  .ToListAsync();
         }
 
@@ -148,9 +148,9 @@ namespace JobMatchAI.Application.Services.Implementations
             var user = await context.Users.FindAsync(id)
                 ?? throw new NotFoundException($"User {id} not found.");
 
-            user.FirstName = dto.FirstName;
-            user.MiddleName = dto.MiddleName;
-            user.LastName = dto.LastName;
+            user.FirstName = dto.FirstName.Trim();
+            user.MiddleName = dto.MiddleName?.Trim()    ;
+            user.LastName = dto.LastName.Trim();
             user.Email = normalizedEmail;
             user.Role = dto.Role;
             user.IsActive = dto.IsActive;
@@ -174,7 +174,7 @@ namespace JobMatchAI.Application.Services.Implementations
         {
             Id = u.Id,
             FirstName = u.FirstName,
-            MiddleName = u.MiddleName ?? "",
+            MiddleName = u.MiddleName,
             LastName = u.LastName,
             Email = u.Email,
             Role = u.Role,

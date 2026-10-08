@@ -23,7 +23,7 @@ namespace JobMatchAI.Application.DTOs
 
         [Required(ErrorMessage = "Email address is required.")]
         [EmailAddress(ErrorMessage = "Invalid email format.")]
-        [StringLength(255, ErrorMessage = "Email address cannot exceed 255 characters.")
+        [StringLength(255, ErrorMessage = "Email address cannot exceed 255 characters.")]
         public string Email { get; init; } = string.Empty;
 
         [EnumDataType(typeof(UserRole), ErrorMessage = "Invalid user role.")]
