@@ -13,10 +13,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Services\Interfaces\ICertificationService.cs" />
     <Compile Include="Services\Interfaces\IEmployerService.cs" />
     <Compile Include="Services\Interfaces\IJobPostingService.cs" />
+    <Compile Include="Services\Interfaces\IJobSkillService.cs" />
     <Compile Include="Services\Interfaces\ISkillService.cs" />
     <Compile Include="Services\Interfaces\IStudentService.cs" />
+    <Compile Include="Services\Interfaces\IStudentSkillService.cs" />
     <Compile Include="Services\Interfaces\IUserService.cs" />
   </ItemGroup>
 
