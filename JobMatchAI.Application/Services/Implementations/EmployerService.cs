@@ -14,6 +14,8 @@ namespace JobMatchAI.Application.Services.Implementations
     {
         public async Task<EmployerDto> CreateAsync(EmployerDto dto)
         {
+            var normalizedCompanyName = dto.CompanyName.Trim().ToLowerInvariant();
+
             var user = await context.Users.FindAsync(dto.UserId)
                 ?? throw new NotFoundException($"User not found: {dto.UserId}");
 
@@ -27,7 +29,7 @@ namespace JobMatchAI.Application.Services.Implementations
             if (profileExists) throw new AlreadyExistsException($"An employer profile already exists for user {dto.UserId}");
 
             var companyExists = await context.Employers
-                .AnyAsync(e => EF.Functions.ILike(e.CompanyName, dto.CompanyName.Trim()));
+                .AnyAsync(e => e.CompanyName.ToLower() == normalizedCompanyName);
 
             if (companyExists) throw new AlreadyExistsException($"Employer with company name '{dto.CompanyName}' already exists.");
 
@@ -101,8 +103,10 @@ namespace JobMatchAI.Application.Services.Implementations
 
         public async Task UpdateAsync(Guid id, EmployerDto dto)
         {
+            var normalizedCompanyName = dto.CompanyName.Trim().ToLowerInvariant();
+
             var companyExists = await context.Employers
-                .AnyAsync(e => e.Id != id && EF.Functions.ILike(e.CompanyName, dto.CompanyName.Trim()));
+                .AnyAsync(e => e.Id != id && e.CompanyName.ToLower() == normalizedCompanyName);
 
             if (companyExists) throw new AlreadyExistsException($"Employer with company name '{dto.CompanyName}' already exists.");
 

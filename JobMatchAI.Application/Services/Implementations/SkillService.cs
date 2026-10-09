@@ -14,8 +14,9 @@ namespace JobMatchAI.Application.Services.Implementations
     {
         public async Task<SkillDto> CreateAsync(SkillDto dto)
         {
+            var normalizedName = dto.Name.Trim().ToLowerInvariant();
             var exists = await context.Skills
-                .AnyAsync(s => EF.Functions.ILike(s.Name, dto.Name.Trim()));
+                .AnyAsync(s => s.Name.ToLower() == normalizedName);
 
             if (exists) throw new AlreadyExistsException($"Skill {dto.Name} already exists.");
 
@@ -90,9 +91,11 @@ namespace JobMatchAI.Application.Services.Implementations
 
         public async Task<SkillDto?> GetByNameAsync(string name)
         {
+            var normalizedName = name.Trim().ToLowerInvariant();
+
             return await context.Skills
                 .AsNoTracking()
-                .Where(s => EF.Functions.ILike(s.Name, name.Trim()))
+                .Where(s => s.Name.ToLower() == normalizedName)
                 .Select(AsSkillDto)
                 .FirstOrDefaultAsync();
                 
@@ -100,8 +103,9 @@ namespace JobMatchAI.Application.Services.Implementations
 
         public async Task UpdateAsync(Guid id, SkillDto dto)
         {
+            var normalizedName = dto.Name.Trim().ToLowerInvariant();
             var exists = await context.Skills
-                .AnyAsync(s => s.Id != id && EF.Functions.ILike(s.Name, dto.Name.Trim()));
+                .AnyAsync(s => s.Id != id && s.Name.ToLower() == normalizedName);
 
             if (exists) throw new AlreadyExistsException($"Skill {dto.Name} already exists.");
 

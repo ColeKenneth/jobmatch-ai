@@ -128,11 +128,11 @@ namespace JobMatchAI.Application.Services.Implementations
 
         public async Task<IEnumerable<JobPostingDto>> GetByLocationAsync(string location)
         {
-            var normalizedLocation = location.Trim();
+            var normalizedLocation = location.Trim().ToLowerInvariant();
 
             return await context.JobPostings
                 .AsNoTracking()
-                .Where(jp => EF.Functions.ILike(jp.Location, $"%{normalizedLocation}%"))
+                .Where(jp => jp.Location.ToLower() == normalizedLocation)
                 .OrderByDescending(jp => jp.PostedDate)
                 .Select(AsJobPostingDto)
                 .ToListAsync();
