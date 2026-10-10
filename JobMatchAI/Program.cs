@@ -14,6 +14,10 @@ builder.Services.AddScoped<IJobSkillService, JobSkillService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IStudentSkillService, StudentSkillService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAlumniService, AlumniService>();
+builder.Services.AddScoped<ICertificationService, CertificationService>();
+builder.Services.AddScoped<IInternshipService, InternshipService>();
+builder.Services.AddScoped<IEmploymentHistoryService, EmploymentHistoryService>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

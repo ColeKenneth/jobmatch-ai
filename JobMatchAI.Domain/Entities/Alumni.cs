@@ -19,7 +19,7 @@ namespace JobMatchAI.Domain.Entities
         [ForeignKey(nameof(UserId))]
         public virtual User? User { get; set; }
 
-        [Column("program", TypeName = "varchar(30)")]
+        [Column("program", TypeName = "varchar(100)")]
         public string Program { get; set; } = string.Empty;
 
         [Column("graduation_year", TypeName = "date")]
@@ -32,7 +32,7 @@ namespace JobMatchAI.Domain.Entities
         public string? CurrentPosition { get; set; }
 
         [NotMapped]
-        public int GetGraduationYear => GraduationDate.Year;
+        public int GraduationYear => GraduationDate.Year;
 
         public virtual ICollection<EmploymentHistory> EmploymentHistory { get; set; } = [];
         public virtual ICollection<Skill> Skills { get; set; } = [];
