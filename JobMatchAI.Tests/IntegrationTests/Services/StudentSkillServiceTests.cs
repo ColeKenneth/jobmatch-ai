@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
-namespace JobMatchAI.Tests.Services
+namespace JobMatchAI.Tests.IntegrationTests.Services
 {
     public class StudentSkillServiceTests : IDisposable
     {
