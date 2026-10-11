@@ -6,14 +6,13 @@ using JobMatchAI.Domain.Enums;
 using JobMatchAI.Domain.Exceptions;
 using JobMatchAI.Infrastructure.Data;
 using JobMatchAI.Tests.Helpers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
 namespace JobMatchAI.Tests.IntegrationTests.Services
 {
-    public class EmployerServiceTests : IDisposable
+    public sealed class EmployerServiceTests : IDisposable
     {
         private readonly AppDbContext _context;
         private readonly EmployerService _service;

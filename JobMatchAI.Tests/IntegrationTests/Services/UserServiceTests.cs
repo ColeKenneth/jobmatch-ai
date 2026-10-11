@@ -12,7 +12,7 @@ using Xunit;
 
 namespace JobMatchAI.Tests.IntegrationTests.Services
 {
-    public class UserServiceTests : IDisposable
+    public sealed class UserServiceTests : IDisposable
     {
         private readonly AppDbContext _context;
         private readonly UserService _service;

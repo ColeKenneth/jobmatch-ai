@@ -13,7 +13,7 @@ using Xunit;
 
 namespace JobMatchAI.Tests.IntegrationTests.Services
 {
-    public class StudentSkillServiceTests : IDisposable
+    public sealed class StudentSkillServiceTests : IDisposable
     {
         private readonly AppDbContext _context;
         private readonly StudentSkillService _service;
@@ -37,7 +37,7 @@ namespace JobMatchAI.Tests.IntegrationTests.Services
             {
                 Id = Guid.NewGuid(),
                 UserId = user.Id,
-                StudentIdNumber = "23-IT12345",
+                StudentIdNumber = "23-QC12345",
                 Program = "BSIT",
                 YearLevel = YearLevel.Graduating,
                 Gwa = 1.25m

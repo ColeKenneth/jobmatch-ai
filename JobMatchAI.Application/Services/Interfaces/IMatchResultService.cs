@@ -7,7 +7,7 @@ namespace JobMatchAI.Application.Services.Interfaces
         Task<MatchResultDto?> GetByIdAsync(Guid id);
         Task<IEnumerable<MatchResultDto>> GetByStudentAsync(Guid studentId);
         Task<IEnumerable<MatchResultDto>> GetByJobPostingAsync(Guid jobPostingId);
-        Task<IEnumerable<MatchResultDto>> GetByStudentAndJobAsync(Guid studentId, Guid jobPostingId);
+        Task<MatchResultDto?> GetByStudentAndJobAsync(Guid studentId, Guid jobPostingId);
         Task<MatchResultDto> CreateAsync(MatchResultDto dto);
         Task UpdateAsync(Guid id, MatchResultDto dto);
         Task DeleteAsync(Guid id);

@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 
-
 namespace JobMatchAI.Application.Services.Implementations
 {
     public class MatchResultService(AppDbContext context, ILogger<MatchResultService> logger) : IMatchResultService
@@ -85,17 +84,18 @@ namespace JobMatchAI.Application.Services.Implementations
             return await context.MatchResults
                 .AsNoTracking()
                 .Where(mr => mr.JobPostingId == jobPostingId)
+                .OrderByDescending(mr => mr.MatchScore)
                 .Select(AsMatchResultDto)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<MatchResultDto>> GetByStudentAndJobAsync(Guid studentId, Guid jobPostingId)
+        public async Task<MatchResultDto?> GetByStudentAndJobAsync(Guid studentId, Guid jobPostingId)
         {
             return await context.MatchResults
                 .AsNoTracking()
                 .Where(mr => mr.StudentId == studentId && mr.JobPostingId == jobPostingId)
                 .Select(AsMatchResultDto)
-                .ToListAsync();
+                .FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<MatchResultDto>> GetByStudentAsync(Guid studentId)
@@ -113,6 +113,7 @@ namespace JobMatchAI.Application.Services.Implementations
             var updatedCount = await context.MatchResults
                 .Where(mr => mr.Id == id)
                 .ExecuteUpdateAsync(s => s
+                .SetProperty(mr => mr.WasViewed, true)
                 .SetProperty(mr => mr.WasApplied, true));
 
             if (updatedCount == 0) throw new NotFoundException($"Match result {id} not found.");
@@ -125,6 +126,8 @@ namespace JobMatchAI.Application.Services.Implementations
             var updatedCount = await context.MatchResults
                 .Where(mr => mr.Id == id)
                 .ExecuteUpdateAsync(s => s
+                .SetProperty(mr => mr.WasViewed, true)
+                .SetProperty(mr => mr.WasApplied, true)
                 .SetProperty(mr => mr.WasHired, true)
                 .SetProperty(mr => mr.HireDate, hireDate));
 
@@ -161,9 +164,9 @@ namespace JobMatchAI.Application.Services.Implementations
             }
 
             matchResult.MatchScore = dto.MatchScore;
+            matchResult.EmployabilityScore = dto.EmployabilityScore;
             matchResult.MatchExplanation = dto.MatchExplanation?.Trim();
             matchResult.FeatureContributions = dto.FeatureContributions?.Trim();
-            matchResult.EmployabilityScore = dto.EmployabilityScore;
             matchResult.WasViewed = dto.WasViewed;
             matchResult.WasApplied = dto.WasApplied;
             matchResult.WasHired = dto.WasHired;

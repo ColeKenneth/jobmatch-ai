@@ -6,14 +6,13 @@ using JobMatchAI.Domain.Enums;
 using JobMatchAI.Domain.Exceptions;
 using JobMatchAI.Infrastructure.Data;
 using JobMatchAI.Tests.Helpers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
 namespace JobMatchAI.Tests.IntegrationTests.Services
 {
-    public class CertificationServiceTests : IDisposable
+    public sealed class CertificationServiceTests : IDisposable
     {
         private readonly AppDbContext _context;
         private readonly CertificationService _service;
@@ -37,7 +36,7 @@ namespace JobMatchAI.Tests.IntegrationTests.Services
             {
                 Id = Guid.NewGuid(),
                 UserId = user.Id,
-                StudentIdNumber = "23-IT99999",
+                StudentIdNumber = "23-QC99999",
                 Program = "BSIT",
                 YearLevel = YearLevel.Graduating,
                 Gwa = 1.50m

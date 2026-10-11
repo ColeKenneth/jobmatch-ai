@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using JobMatchAI.Application.DTOs;
 using JobMatchAI.Application.Services.Implementations;
-using JobMatchAI.Application.Services.Interfaces;
 using JobMatchAI.Domain.Entities;
 using JobMatchAI.Domain.Enums;
 using JobMatchAI.Domain.Exceptions;
@@ -13,7 +12,7 @@ using Xunit;
 
 namespace JobMatchAI.Tests.IntegrationTests.Services
 {
-    public class SkillServiceTests : IDisposable
+    public sealed class SkillServiceTests : IDisposable
     {
         private readonly AppDbContext _context;
         private readonly SkillService _service;

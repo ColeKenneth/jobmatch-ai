@@ -20,6 +20,8 @@
     <Compile Include="Services\Interfaces\IInternshipService.cs" />
     <Compile Include="Services\Interfaces\IJobPostingService.cs" />
     <Compile Include="Services\Interfaces\IJobSkillService.cs" />
+    <Compile Include="Services\Interfaces\IMatchResultService.cs" />
+    <Compile Include="Services\Interfaces\IPlacementService.cs" />
     <Compile Include="Services\Interfaces\ISkillService.cs" />
     <Compile Include="Services\Interfaces\IStudentService.cs" />
     <Compile Include="Services\Interfaces\IStudentSkillService.cs" />
