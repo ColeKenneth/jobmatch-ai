@@ -1,3 +1,5 @@
+using JobMatchAI.Application.Authentication.Interfaces;
+using JobMatchAI.Application.Authentication.Services;
 using JobMatchAI.Application.Services.Implementations;
 using JobMatchAI.Application.Services.Interfaces;
 using JobMatchAI.Infrastructure.Data;
@@ -20,6 +22,10 @@ builder.Services.AddScoped<IInternshipService, InternshipService>();
 builder.Services.AddScoped<IEmploymentHistoryService, EmploymentHistoryService>();
 builder.Services.AddScoped<IMatchResultService, MatchResultService>();
 builder.Services.AddScoped<IPlacementService, PlacementService>();
+
+builder.Services.AddSingleton<IPasswordHasher, Argon2PasswordHasher>();
+builder.Services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
