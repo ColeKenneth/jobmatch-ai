@@ -10,6 +10,8 @@ namespace JobMatchAI.Application.DTOs
     {
         public Guid Id { get; init; }
 
+        public Guid StudentId { get; init; }
+
         [Required(ErrorMessage = "Certification name is required.")]
         [StringLength(100, ErrorMessage = "Certification name cannot exceed 100 characters.")]
         public string Name { get; init; } = string.Empty;

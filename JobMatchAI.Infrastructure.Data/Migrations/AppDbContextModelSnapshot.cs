@@ -43,7 +43,7 @@ namespace JobMatchAI.Infrastructure.Data.Migrations
 
                     b.Property<string>("Program")
                         .IsRequired()
-                        .HasColumnType("varchar(30)")
+                        .HasColumnType("varchar(100)")
                         .HasColumnName("program");
 
                     b.Property<Guid>("UserId")

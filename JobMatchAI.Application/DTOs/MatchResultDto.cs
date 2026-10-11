@@ -1,32 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace JobMatchAI.Application.DTOs
 {
     public record MatchResultDto
     {
+        public Guid Id { get; init; }
+
         public Guid StudentId { get; init; }
 
         public Guid JobPostingId { get; init; }
 
-        [Required(ErrorMessage = "Job title is required.")]
-        [StringLength(100, ErrorMessage = "Job title cannot exceed 100 characters.")]
-        public string JobTitle { get; init; } = string.Empty;
-
-        [Required(ErrorMessage = "Company name is required.")]
-        [StringLength(100, ErrorMessage = "Company name cannot exceed 100 characters.")]
-        public string CompanyName { get; init; } = string.Empty;
-
-        [Range(0.00, 100.00, ErrorMessage = "Matching score is between 0% to 100%.")]
+        [Range(0.00, 100.00, ErrorMessage = "Matching score must be between 0% and 100%.")]
         public double MatchScore { get; init; }
 
-        public DateTime GeneratedAt { get; init; } = DateTime.UtcNow;
+        [Range(0.00, 100.00, ErrorMessage = "Employability score must be between 0% and 100%.")]
+        public double? EmployabilityScore { get; init; }
+
+        public string? MatchExplanation { get; init; }
+
+        public string? FeatureContributions { get; init; }
+
+        public DateTime GeneratedAt { get; init; }
+
+        public bool? WasViewed { get; init; }
+
+        public bool? WasApplied { get; init; }
 
         public bool? WasHired { get; init; }
 
-        [StringLength(2000, ErrorMessage = "Match explanation must be 2000 characters maximum.")]
-        public string? MatchExplanation { get; init; }
+        public DateTime? HireDate { get; init; }
     }
 }
