@@ -14,14 +14,15 @@ namespace JobMatchAI.Application.Services.Implementations
     {
         public async Task<SkillDto> CreateAsync(SkillDto dto)
         {
+            var trimmedName = dto.Name.Trim();
             var exists = await context.Skills
-                .AnyAsync(s => EF.Functions.ILike(s.Name, dto.Name.Trim()));
+                .AnyAsync(s => s.Name.ToLower() == trimmedName.ToLower());
 
             if (exists) throw new AlreadyExistsException($"Skill {dto.Name} already exists.");
 
             var skill = new Skill
             {
-                Name = dto.Name.Trim(),
+                Name = trimmedName,
                 Category = dto.Category,
                 OntologyId = dto.OntologyId?.Trim(),
                 Description = dto.Description?.Trim(),
@@ -33,7 +34,7 @@ namespace JobMatchAI.Application.Services.Implementations
             try
             {
                 await context.SaveChangesAsync();
-            } 
+            }
             catch (DbUpdateException ex)
             {
                 logger.LogError(ex, "Error creating skill {Name}", dto.Name);
@@ -90,25 +91,27 @@ namespace JobMatchAI.Application.Services.Implementations
 
         public async Task<SkillDto?> GetByNameAsync(string name)
         {
+            var normalizedName = name.Trim().ToLower();
+
             return await context.Skills
                 .AsNoTracking()
-                .Where(s => EF.Functions.ILike(s.Name, name.Trim()))
+                .Where(s => s.Name.ToLower() == normalizedName)
                 .Select(AsSkillDto)
                 .FirstOrDefaultAsync();
-                
         }
 
         public async Task UpdateAsync(Guid id, SkillDto dto)
         {
+            var trimmedName = dto.Name.Trim();
             var exists = await context.Skills
-                .AnyAsync(s => s.Id != id && EF.Functions.ILike(s.Name, dto.Name.Trim()));
+                .AnyAsync(s => s.Id != id && s.Name.ToLower() == trimmedName.ToLower());
 
             if (exists) throw new AlreadyExistsException($"Skill {dto.Name} already exists.");
 
             var skill = await context.Skills.FindAsync(id)
                 ?? throw new NotFoundException($"Skill {id} not found.");
 
-            skill.Name = dto.Name.Trim();
+            skill.Name = trimmedName;
             skill.Category = dto.Category;
             skill.OntologyId = dto.OntologyId?.Trim();
             skill.Description = dto.Description?.Trim();

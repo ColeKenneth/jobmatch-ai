@@ -5,6 +5,7 @@ using JobMatchAI.Domain.Exceptions;
 using JobMatchAI.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Security.Cryptography;
 
 namespace JobMatchAI.Application.Authentication.Services
 {
@@ -28,9 +29,57 @@ namespace JobMatchAI.Application.Authentication.Services
 
             if (!user.IsActive) throw new BusinessRuleException("Your account has been deactivated.");
 
-            logger.LogInformation("User {UserId} logged in.", user.Id);
+            var refreshToken = GenerateRefreshToken(user.Id);
+            context.RefreshTokens.Add(refreshToken);
+            
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                logger.LogError(ex, "Error saving refresh token during login for user {UserId}", user.Id);
+                throw new BusinessRuleException("Failed to process login.");
+            }
 
-            return BuildAuthResponse(user);
+            logger.LogInformation("User {UserId} logged in.", user.Id);
+            return BuildAuthResponse(user, refreshToken);
+        }
+
+        public async Task<AuthResponse> RefreshTokenAsync(string refreshToken)
+        {
+            var existingToken = await context.RefreshTokens
+                .Include(rt => rt.User)
+                .FirstOrDefaultAsync(rt => rt.Token == refreshToken)
+                ?? throw new BusinessRuleException("Invalid refresh token.");
+
+            if (!existingToken.IsActive)
+            {
+                throw new BusinessRuleException("Refresh token is expired or has been revoked.");
+            }
+
+            var user = existingToken.User ?? throw new BusinessRuleException("Invalid refresh token.");
+            if (!user.IsActive) throw new BusinessRuleException("Your account has been deactivated.");
+
+            var newRefreshToken = GenerateRefreshToken(user.Id);
+            existingToken.RevokedAt = DateTime.UtcNow;
+            existingToken.ReplacedByToken = newRefreshToken.Token;
+
+            context.RefreshTokens.Add(newRefreshToken);
+            
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                logger.LogError(ex, "Error rotating refresh token for user {UserId}", user.Id);
+                throw new BusinessRuleException("Failed to refresh token.");
+            }
+
+            logger.LogInformation("Rotated refresh token for user {UserId}", user.Id);
+            return BuildAuthResponse(user, newRefreshToken);
+
         }
 
         public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
@@ -55,6 +104,9 @@ namespace JobMatchAI.Application.Authentication.Services
 
             context.Users.Add(user);
 
+            var refreshToken = GenerateRefreshToken(user.Id);
+            context.RefreshTokens.Add(refreshToken);
+
             try
             {
                 await context.SaveChangesAsync();
@@ -66,11 +118,44 @@ namespace JobMatchAI.Application.Authentication.Services
             }
 
             logger.LogInformation("Registered user {UserId} with role {Role}", user.Id, user.Role);
-
-            return BuildAuthResponse(user);
+            return BuildAuthResponse(user, refreshToken);
         }
 
-        private AuthResponse BuildAuthResponse(User user)
+        public async Task RevokeTokenAsync(string refreshToken)
+        {
+            var existingToken = await context.RefreshTokens
+                .FirstOrDefaultAsync(rt => rt.Token == refreshToken)
+                ?? throw new BusinessRuleException("Invalid refresh token.");
+
+            if (!existingToken.IsActive) return;
+
+            existingToken.RevokedAt = DateTime.UtcNow;
+
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                logger.LogError(ex, "Error revoking refresh token.");
+                throw new BusinessRuleException("Failed to revoke token.");
+            }
+
+            logger.LogInformation("Revoked refresh token {TokenId}", existingToken.Id);
+        }
+
+        private static RefreshToken GenerateRefreshToken(Guid userId)
+        {
+            return new RefreshToken
+            {
+                UserId = userId,
+                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                ExpiresAt = DateTime.UtcNow.AddDays(7),
+                CreatedAt = DateTime.UtcNow
+            };
+        }
+
+        private AuthResponse BuildAuthResponse(User user, RefreshToken refreshToken)
         {
             var (token, expiresAt) = jwtGenerator.GenerateToken(user);
 
@@ -81,7 +166,9 @@ namespace JobMatchAI.Application.Authentication.Services
                 FullName = user.FullName,
                 Role = user.Role.ToString(),
                 Token = token,
-                ExpiresAt = expiresAt
+                ExpiresAt = expiresAt,
+                RefreshToken = refreshToken.Token,
+                RefreshTokenExpiresAt = refreshToken.ExpiresAt
             };
         }
     }

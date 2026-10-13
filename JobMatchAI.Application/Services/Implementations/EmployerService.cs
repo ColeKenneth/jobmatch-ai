@@ -26,15 +26,16 @@ namespace JobMatchAI.Application.Services.Implementations
 
             if (profileExists) throw new AlreadyExistsException($"An employer profile already exists for user {dto.UserId}");
 
+            var trimmedCompanyName = dto.CompanyName.Trim();
             var companyExists = await context.Employers
-                .AnyAsync(e => EF.Functions.ILike(e.CompanyName, dto.CompanyName.Trim()));
+                .AnyAsync(e => e.CompanyName.ToLower() == trimmedCompanyName.ToLower());
 
             if (companyExists) throw new AlreadyExistsException($"Employer with company name '{dto.CompanyName}' already exists.");
 
             var employer = new Employer
             {
                 UserId = dto.UserId,
-                CompanyName = dto.CompanyName.Trim(),
+                CompanyName = trimmedCompanyName,
                 Industry = dto.Industry.Trim(),
                 Website = dto.Website?.Trim(),
                 CompanyDescription = dto.CompanyDescription?.Trim(),
@@ -46,7 +47,7 @@ namespace JobMatchAI.Application.Services.Implementations
             try
             {
                 await context.SaveChangesAsync();
-            } 
+            }
             catch (DbUpdateException ex)
             {
                 logger.LogError(ex, "Error creating employer for user {UserId}", dto.UserId);
@@ -101,15 +102,16 @@ namespace JobMatchAI.Application.Services.Implementations
 
         public async Task UpdateAsync(Guid id, EmployerDto dto)
         {
+            var trimmedCompanyName = dto.CompanyName.Trim();
             var companyExists = await context.Employers
-                .AnyAsync(e => e.Id != id && EF.Functions.ILike(e.CompanyName, dto.CompanyName.Trim()));
+                .AnyAsync(e => e.Id != id && e.CompanyName.ToLower() == trimmedCompanyName.ToLower());
 
             if (companyExists) throw new AlreadyExistsException($"Employer with company name '{dto.CompanyName}' already exists.");
 
             var employer = await context.Employers.FindAsync(id)
                 ?? throw new NotFoundException($"Employer {id} not found.");
 
-            employer.CompanyName = dto.CompanyName.Trim();
+            employer.CompanyName = trimmedCompanyName;
             employer.Industry = dto.Industry.Trim();
             employer.Website = dto.Website?.Trim();
             employer.CompanyDescription = dto.CompanyDescription?.Trim();
