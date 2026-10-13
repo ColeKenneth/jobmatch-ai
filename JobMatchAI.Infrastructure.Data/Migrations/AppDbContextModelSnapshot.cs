@@ -450,6 +450,48 @@ namespace JobMatchAI.Infrastructure.Data.Migrations
                     b.ToTable("placement_records");
                 });
 
+            modelBuilder.Entity("JobMatchAI.Domain.Entities.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp")
+                        .HasColumnName("expires_at");
+
+                    b.Property<string>("ReplacedByToken")
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("replaced_by_token");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("timestamp")
+                        .HasColumnName("revoked_at");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("token");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("refresh_tokens");
+                });
+
             modelBuilder.Entity("JobMatchAI.Domain.Entities.Skill", b =>
                 {
                     b.Property<Guid>("Id")
@@ -755,6 +797,17 @@ namespace JobMatchAI.Infrastructure.Data.Migrations
                     b.Navigation("JobPosting");
 
                     b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("JobMatchAI.Domain.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("JobMatchAI.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("JobMatchAI.Domain.Entities.Skill", b =>

@@ -1,26 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using JobMatchAI.Domain.Entities;
+﻿using JobMatchAI.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace JobMatchAI.Infrastructure.Data
 {
     public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
     {
-        public DbSet<User> Users => Set<User>();
-        public DbSet<Student> Students => Set<Student>();
-        public DbSet<Alumni> Alumni => Set<Alumni>();
-        public DbSet<Employer> Employers => Set<Employer>();
-        public DbSet<JobPosting> JobPostings => Set<JobPosting>();
-        public DbSet<Skill> Skills => Set<Skill>();
-        public DbSet<StudentSkill> StudentSkills => Set<StudentSkill>();
-        public DbSet<JobSkill> JobSkills => Set<JobSkill>();
-        public DbSet<Certification> Certifications => Set<Certification>();
-        public DbSet<Internship> Internships => Set<Internship>();
-        public DbSet<EmploymentHistory> EmploymentHistories => Set<EmploymentHistory>();
-        public DbSet<MatchResult> MatchResults => Set<MatchResult>();
-        public DbSet<PlacementRecord> PlacementRecords => Set<PlacementRecord>();
+        public virtual DbSet<User> Users => Set<User>();
+        public virtual DbSet<Student> Students => Set<Student>();
+        public virtual DbSet<Alumni> Alumni => Set<Alumni>();
+        public virtual DbSet<Employer> Employers => Set<Employer>();
+        public virtual DbSet<JobPosting> JobPostings => Set<JobPosting>();
+        public virtual DbSet<Skill> Skills => Set<Skill>();
+        public virtual DbSet<StudentSkill> StudentSkills => Set<StudentSkill>();
+        public virtual DbSet<JobSkill> JobSkills => Set<JobSkill>();
+        public virtual DbSet<Certification> Certifications => Set<Certification>();
+        public virtual DbSet<Internship> Internships => Set<Internship>();
+        public virtual DbSet<EmploymentHistory> EmploymentHistories => Set<EmploymentHistory>();
+        public virtual DbSet<MatchResult> MatchResults => Set<MatchResult>();
+        public virtual DbSet<PlacementRecord> PlacementRecords => Set<PlacementRecord>();
+        public virtual DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -173,6 +171,17 @@ namespace JobMatchAI.Infrastructure.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasIndex(e => new { e.StudentId, e.JobPostingId }).IsUnique();
+            });
+
+            modelBuilder.Entity<RefreshToken>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasIndex(e => e.Token).IsUnique();
+
+                entity.HasOne(rt => rt.User)
+                .WithMany()
+                .HasForeignKey(rt => rt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }
