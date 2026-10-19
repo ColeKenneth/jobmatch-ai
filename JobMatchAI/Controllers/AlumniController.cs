@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JobMatchAI.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
+    [Authorize]
     public class AlumniController(IAlumniService alumniService) : ControllerBase
     {
         [HttpGet]
@@ -60,7 +63,7 @@ namespace JobMatchAI.Controllers
         }
 
         [HttpDelete("{id:guid}")]
-        [Authorize(Roles = "Admin,Alumni")]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

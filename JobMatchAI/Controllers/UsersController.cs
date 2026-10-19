@@ -54,6 +54,7 @@ namespace JobMatchAI.Controllers
         [HttpPut("{id:guid}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(Guid id, [FromBody] UserDto dto)
         {
@@ -64,6 +65,7 @@ namespace JobMatchAI.Controllers
         [HttpPatch("{id:guid}/deactivate")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Deactivate(Guid id)
         {
@@ -74,6 +76,7 @@ namespace JobMatchAI.Controllers
         [HttpPatch("{id:guid}/activate")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Activate(Guid id)
         {
@@ -84,6 +87,7 @@ namespace JobMatchAI.Controllers
         [HttpDelete("{id:guid}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(Guid id)
         {
