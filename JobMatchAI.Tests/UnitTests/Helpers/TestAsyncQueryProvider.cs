@@ -136,7 +136,7 @@ namespace JobMatchAI.Tests.UnitTests.Helpers
 
         public static DbSet<T> CreateMockDbSet<T>(IList<T> backingList) where T : class
         {
-            var list = backingList as List<T> ?? backingList.ToList();
+            var list = backingList as List<T> ?? [.. backingList];
             return CreateInternal(list.AsQueryable(), list);
         }
 
