@@ -6,19 +6,19 @@ namespace JobMatchAI.Domain.Entities
     public class JobSkill
     {
         [Column("id")]
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; init; } = Guid.NewGuid();
 
         [Column("job_posting_id")]
-        public Guid JobPostingId { get; set; }
+        public Guid JobPostingId { get; init; }
 
         [ForeignKey(nameof(JobPostingId))]
-        public virtual JobPosting? JobPosting { get; set; }
+        public JobPosting? JobPosting { get; init; }
 
         [Column("skill_id")]
-        public Guid SkillId { get; set; }
+        public Guid SkillId { get; init; }
 
         [ForeignKey(nameof(SkillId))]
-        public virtual Skill? Skill { get; set; }
+        public Skill? Skill { get; init; }
 
         [Column("is_required", TypeName = "bool")]
         public bool IsRequired { get; set; } = true;

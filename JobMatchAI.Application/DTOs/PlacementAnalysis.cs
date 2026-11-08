@@ -1,8 +1,4 @@
 ﻿using JobMatchAI.Application.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace JobMatchAI.Application.DTOs
 {
     public record PlacementAnalysis

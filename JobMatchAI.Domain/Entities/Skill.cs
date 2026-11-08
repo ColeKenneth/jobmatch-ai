@@ -9,7 +9,7 @@ namespace JobMatchAI.Domain.Entities
     {
         [Key]
         [Column("id")]
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; init; } = Guid.NewGuid();
 
         [Column("name", TypeName = "varchar(100)")]
         public string Name { get; set; } = string.Empty;
@@ -26,7 +26,7 @@ namespace JobMatchAI.Domain.Entities
         [Column("icon_url", TypeName = "varchar(500)")]
         public string? IconUrl { get; set; }
 
-        public virtual ICollection<StudentSkill> StudentSkills { get; set; } = [];
-        public virtual ICollection<JobSkill> JobSkills { get; set; } = [];
+        public ICollection<StudentSkill> StudentSkills { get; init; } = [];
+        public ICollection<JobSkill> JobSkills { get; init; } = [];
     }
 }

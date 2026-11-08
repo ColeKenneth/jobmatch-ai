@@ -9,13 +9,13 @@ namespace JobMatchAI.Domain.Entities
     {
         [Key]
         [Column("id")]
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; init; } = Guid.NewGuid();
 
         [Column("user_id")]
-        public Guid UserId { get; set; }
+        public Guid UserId { get; init; }
 
         [ForeignKey(nameof(UserId))]
-        public virtual User? User { get; set; }
+        public User? User { get; init; }
 
         [Column("student_id_number", TypeName = "varchar(30)")]
         public string StudentIdNumber { get; set; } = string.Empty;
@@ -38,9 +38,9 @@ namespace JobMatchAI.Domain.Entities
         [Column("resume_text", TypeName = "text")]
         public string? ResumeText { get; set; }
 
-        public virtual ICollection<StudentSkill> StudentSkills { get; set; } = [];
-        public virtual ICollection<MatchResult> MatchResults { get; set; } = [];
+        public ICollection<StudentSkill> StudentSkills { get; init; } = [];
+        public ICollection<MatchResult> MatchResults { get; init; } = [];
 
-        public virtual ICollection<PlacementRecord> PlacementRecords { get; set; } = [];
+        public ICollection<PlacementRecord> PlacementRecords { get; init; } = [];
     }
 }

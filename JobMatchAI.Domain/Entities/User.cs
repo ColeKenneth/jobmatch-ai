@@ -9,7 +9,7 @@ namespace JobMatchAI.Domain.Entities
     {
         [Key]
         [Column("id")]
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; init; } = Guid.NewGuid();
 
         [Column("first_name", TypeName = "varchar(100)")]
         public string FirstName { get; set; } = string.Empty;
@@ -30,7 +30,7 @@ namespace JobMatchAI.Domain.Entities
         public UserRole Role { get; set; }
 
         [Column("created_at", TypeName = "timestamp")]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
 
         [Column("updated_at", TypeName = "timestamp")]
         public DateTime? UpdatedAt { get; set; }
@@ -42,9 +42,9 @@ namespace JobMatchAI.Domain.Entities
         public string FullName => string.IsNullOrWhiteSpace(MiddleName) ?
             $"{FirstName} {LastName}" : $"{FirstName} {MiddleName} {LastName}";
 
-        public virtual Student? Student { get; set; }
-        public virtual Alumni? Alumni { get; set; }
-        public virtual Employer? Employer { get; set; }
+        public Student? Student { get; init; }
+        public Alumni? Alumni { get; init; }
+        public Employer? Employer { get; init; }
 
             
     }

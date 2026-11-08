@@ -14,12 +14,12 @@ namespace JobMatchAI.Application.Services.Implementations
     {
         private static void ValidateEmploymentDates(EmploymentHistoryDto dto)
         {
-            if (dto.IsCurrent && dto.EndDate.HasValue)
+            if (dto is { IsCurrent: true, EndDate: not null })
             {
                 throw new BusinessRuleException("A current position cannot have an end date.");
             }
 
-            if (!dto.IsCurrent && !dto.EndDate.HasValue)
+            if (dto is { IsCurrent: false, EndDate: null })
             {
                 throw new BusinessRuleException("A past position must have an end date.");
             }

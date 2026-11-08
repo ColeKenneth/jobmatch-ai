@@ -8,19 +8,19 @@ namespace JobMatchAI.Domain.Entities
     {
         [Key]
         [Column("id")]
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; init; } = Guid.NewGuid();
 
         [Column("student_id")]
-        public Guid StudentId { get; set; }
+        public Guid StudentId { get; init; }
 
         [ForeignKey(nameof(StudentId))]
-        public virtual Student? Student { get; set; }
+        public Student? Student { get; init; }
 
         [Column("job_posting_id")]
-        public Guid JobPostingId { get; set; }
+        public Guid JobPostingId { get; init; }
 
         [ForeignKey(nameof(JobPostingId))]
-        public virtual JobPosting? JobPosting { get; set; }
+        public JobPosting? JobPosting { get; init; }
 
         [Column("match_score", TypeName = "decimal(5,2)")]
         public double MatchScore { get; set; }
@@ -35,7 +35,7 @@ namespace JobMatchAI.Domain.Entities
         public string? FeatureContributions { get; set; }
 
         [Column("generated_at", TypeName = "timestamp")]
-        public DateTime GeneratedAt { get; set; } = DateTime.UtcNow;
+        public DateTime GeneratedAt { get; init; } = DateTime.UtcNow;
 
         [Column("was_viewed", TypeName = "boolean")]
         public bool? WasViewed { get; set; }

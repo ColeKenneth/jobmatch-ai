@@ -9,13 +9,13 @@ namespace JobMatchAI.Domain.Entities
     {
         [Key]
         [Column("id")]
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; init; } = Guid.NewGuid();
 
         [Column("employer_id")]
-        public Guid EmployerId { get; set; }
+        public Guid EmployerId { get; init; }
 
         [ForeignKey(nameof(EmployerId))]
-        public virtual Employer? Employer { get; set; }
+        public Employer? Employer { get; init; }
 
         [Column("title", TypeName = "varchar(50)")]
         public string Title { get; set; } = string.Empty;
@@ -45,7 +45,7 @@ namespace JobMatchAI.Domain.Entities
         public EmploymentType EmploymentType { get; set; }
 
         [Column("posted_date", TypeName = "timestamp")]
-        public DateTime PostedDate { get; set; } = DateTime.UtcNow;
+        public DateTime PostedDate { get; init; } = DateTime.UtcNow;
 
         [Column("deadline", TypeName = "timestamp")]
         public DateTime? Deadline { get; set; }
@@ -54,14 +54,13 @@ namespace JobMatchAI.Domain.Entities
         public bool IsActive { get; set; } = true;
 
         [Column("views", TypeName = "int")]
-        public int Views { get; set; } = 0;
+        public int Views { get; init; }
 
         [Column("applications", TypeName = "int")]
-        public int Applications { get; set; } = 0;
+        public int Applications { get; init; }
 
-        public virtual ICollection<JobSkill> RequiredSkills { get; set; } = [];
-        public virtual ICollection<MatchResult> MatchResults { get; set; } = [];
-
-        public virtual ICollection<PlacementRecord> PlacementRecords { get; set; } = [];
+        public ICollection<JobSkill> RequiredSkills { get; init; } = [];
+        public ICollection<MatchResult> MatchResults { get; init; } = [];
+        public ICollection<PlacementRecord> PlacementRecords { get; init; } = [];
     }
 }

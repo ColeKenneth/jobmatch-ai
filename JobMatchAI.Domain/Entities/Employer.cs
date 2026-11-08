@@ -8,13 +8,13 @@ namespace JobMatchAI.Domain.Entities
     {
         [Key]
         [Column("id")]
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; init; } = Guid.NewGuid();
 
         [Column("user_id")]
-        public Guid UserId { get; set; }
+        public Guid UserId { get; init; }
 
         [ForeignKey(nameof(UserId))]
-        public virtual User? User { get; set; }
+        public User? User { get; init; }
 
         [Column("company_name", TypeName = "varchar(80)")]
         public string CompanyName { get; set; } = string.Empty;
@@ -31,7 +31,7 @@ namespace JobMatchAI.Domain.Entities
         [Column("logo_url", TypeName = "varchar(500)")]
         public string? LogoUrl { get; set; }
 
-        public virtual ICollection<JobPosting> JobPostings { get; set; } = [];
+        public ICollection<JobPosting> JobPostings { get; init; } = [];
 
 
     }

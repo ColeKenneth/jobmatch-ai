@@ -1,10 +1,4 @@
-﻿using JobMatchAI.Application.Attributes;
-using JobMatchAI.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace JobMatchAI.Application.DTOs
 {

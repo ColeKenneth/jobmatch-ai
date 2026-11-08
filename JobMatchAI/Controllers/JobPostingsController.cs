@@ -17,8 +17,8 @@ namespace JobMatchAI.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<IEnumerable<JobPostingDto>>> GetAll()
         {
-            var jobpostings = await jobPostingService.GetAllAsync();
-            return Ok(jobpostings);
+            var jobPostings = await jobPostingService.GetAllAsync();
+            return Ok(jobPostings);
         }
 
         [HttpGet("active")]
@@ -29,8 +29,8 @@ namespace JobMatchAI.Controllers
 
         public async Task<ActionResult<IEnumerable<JobPostingDto>>> GetActiveJobs()
         {
-            var jobpostings = await jobPostingService.GetActiveJobsAsync();
-            return Ok(jobpostings);
+            var jobPostings = await jobPostingService.GetActiveJobsAsync();
+            return Ok(jobPostings);
         }
 
         [HttpGet("{id:guid}")]

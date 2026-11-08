@@ -9,19 +9,19 @@ namespace JobMatchAI.Domain.Entities
     {
         [Key]
         [Column("id")]
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; init; } = Guid.NewGuid();
 
         [Column("student_id")]
-        public Guid StudentId { get; set; }
+        public Guid StudentId { get; init; }
 
         [ForeignKey(nameof(StudentId))]
-        public virtual Student? Student { get; set; }
+        public Student? Student { get; init; }
 
         [Column("job_posting_id")]
-        public Guid JobPostingId { get; set; }
+        public Guid JobPostingId { get; init; }
 
         [ForeignKey(nameof(JobPostingId))]
-        public virtual JobPosting? JobPosting { get; set; }
+        public JobPosting? JobPosting { get; init; }
 
         [Column("placement_date", TypeName = "timestamp")]
         public DateTime PlacementDate { get; set; }

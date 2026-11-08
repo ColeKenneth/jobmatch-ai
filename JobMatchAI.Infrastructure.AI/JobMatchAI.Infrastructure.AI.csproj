@@ -10,4 +10,9 @@
     <ProjectReference Include="..\JobMatchAI.Application\JobMatchAI.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.5.1" />
+    <PackageReference Include="UglyToad.PdfPig" Version="1.7.0-custom-5" />
+  </ItemGroup>
+
 </Project>

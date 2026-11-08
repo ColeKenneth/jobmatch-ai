@@ -8,22 +8,22 @@ namespace JobMatchAI.Domain.Entities
     {
         [Key]
         [Column("id")]
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; init; } = Guid.NewGuid();
 
         [Column("user_id")]
-        public Guid UserId { get; set; }
+        public Guid UserId { get; init; }
 
         [ForeignKey(nameof(UserId))]
-        public virtual User? User { get; set; }
+        public User? User { get; init; }
 
         [Column("token", TypeName = "varchar(500)")]
-        public string Token { get; set; } = string.Empty;
+        public string Token { get; init; } = string.Empty;
 
         [Column("expires_at", TypeName = "timestamp")]
-        public DateTime ExpiresAt { get; set; }
+        public DateTime ExpiresAt { get; init; }
 
         [Column("created_at", TypeName = "timestamp")]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
 
         [Column("revoked_at", TypeName = "timestamp")]
         public DateTime? RevokedAt { get; set; }

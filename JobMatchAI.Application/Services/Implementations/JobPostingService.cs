@@ -28,7 +28,7 @@ namespace JobMatchAI.Application.Services.Implementations
             var employer = await context.Employers.FindAsync(dto.EmployerId)
                 ?? throw new NotFoundException($"Employer not found: {dto.EmployerId}");
 
-            if (dto.MinSalary.HasValue && dto.MaxSalary.HasValue && dto.MinSalary > dto.MaxSalary)
+            if (dto is { MinSalary: not null, MaxSalary: not null } && dto.MinSalary > dto.MaxSalary)
             {
                 throw new BusinessRuleException("Minimum salary cannot be greater than the maximum salary.");
             }
@@ -172,7 +172,7 @@ namespace JobMatchAI.Application.Services.Implementations
 
         public async Task UpdateAsync(Guid id, JobPostingDto dto)
         {
-            if (dto.MinSalary.HasValue && dto.MaxSalary.HasValue && dto.MinSalary > dto.MaxSalary)
+            if (dto is { MinSalary: not null, MaxSalary: not null } && dto.MinSalary > dto.MaxSalary)
             {
                 throw new BusinessRuleException("Minimum salary cannot be greater than the maximum salary.");
             }
