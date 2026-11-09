@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
+using JobMatchAI.Infrastructure.AI.Services;
+using Microsoft.AspNetCore.Http.Features;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
@@ -36,6 +38,7 @@ builder.Services.AddScoped<IInternshipService, InternshipService>();
 builder.Services.AddScoped<IEmploymentHistoryService, EmploymentHistoryService>();
 builder.Services.AddScoped<IMatchResultService, MatchResultService>();
 builder.Services.AddScoped<IPlacementService, PlacementService>();
+builder.Services.AddScoped<IResumeParserService, ResumeParserService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -71,6 +74,11 @@ builder.Services.AddSwaggerGen(options =>
     {
         [new OpenApiSecuritySchemeReference("Bearer", document)] = []
     });
+});
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 31 * 1024 * 1024;
 });
 
 var app = builder.Build();

@@ -149,7 +149,7 @@ namespace JobMatchAI.Application.Services.Implementations
                 ?? throw new NotFoundException($"User {id} not found.");
 
             user.FirstName = dto.FirstName.Trim();
-            user.MiddleName = dto.MiddleName?.Trim()    ;
+            user.MiddleName = dto.MiddleName?.Trim();
             user.LastName = dto.LastName.Trim();
             user.Email = normalizedEmail;
             user.Role = dto.Role;

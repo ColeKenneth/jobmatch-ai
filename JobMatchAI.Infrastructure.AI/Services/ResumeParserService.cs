@@ -23,7 +23,7 @@ public class ResumeParserService : IResumeParserService
 
     }
 
-    private Task<string> ExtractFromPdfAsync(Stream fileStream)
+    private static Task<string> ExtractFromPdfAsync(Stream fileStream)
     {
         var text = new StringBuilder();
 
@@ -40,7 +40,7 @@ public class ResumeParserService : IResumeParserService
         return Task.FromResult(text.ToString());
     }
 
-    private Task<string> ExtractFromDocxAsync(Stream fileStream)
+    private static Task<string> ExtractFromDocxAsync(Stream fileStream)
     {
         var text = new StringBuilder();
 

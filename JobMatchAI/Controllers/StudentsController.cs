@@ -71,6 +71,56 @@ namespace JobMatchAI.Controllers
             return NoContent();
         }
 
+        [HttpPost("{id:guid}/upload-resume")]
+        [Authorize(Roles = "Admin,Student")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> UploadResume(Guid id, IFormFile? file, [FromServices] IResumeParserService parserService)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file uploaded.");
+            }
+
+            const long maxFileSize = 30 * 1024 * 1024;
+            if (file.Length > maxFileSize)
+            {
+                return BadRequest("File size exceeds the 30MB limit.");
+            }
+
+            var allowedExtensions = new[] { ".pdf", ".docx" };
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+            if (!allowedExtensions.Contains(extension))
+            {
+                return BadRequest("Invalid file type uploaded. Only PDF and DOCX are allowed.");
+            }
+
+            try
+            {
+                await using var stream = file.OpenReadStream();
+                var extractedText = await parserService.ExtractTextAsync(stream, file.FileName);
+
+                if (string.IsNullOrWhiteSpace(extractedText))
+                {
+                    return BadRequest("Could not extract text from the file. Please ensure it is not a scanned image.");
+                }
+
+                await studentService.UpdateResumeAsync(id, file.FileName, extractedText);
+                return Ok(new { message = "Resume uploaded successfully.", textLength = extractedText.Length });
+            }
+            catch (NotSupportedException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An error occurred while processing the file.");
+            }
+            
+        }
+
         [HttpPut("{id:guid}/resume")]
         [Authorize(Roles = "Admin,Student")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
