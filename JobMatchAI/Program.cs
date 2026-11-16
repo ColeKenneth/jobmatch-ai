@@ -39,6 +39,7 @@ builder.Services.AddScoped<IEmploymentHistoryService, EmploymentHistoryService>(
 builder.Services.AddScoped<IMatchResultService, MatchResultService>();
 builder.Services.AddScoped<IPlacementService, PlacementService>();
 builder.Services.AddScoped<IResumeParserService, ResumeParserService>();
+builder.Services.AddScoped<ISkillExtractorService, SkillExtractorService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
