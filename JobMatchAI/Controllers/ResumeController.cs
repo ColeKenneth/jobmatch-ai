@@ -1,3 +1,4 @@
+using JobMatchAI.Application.DTOs;
 using JobMatchAI.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,16 +27,18 @@ public class ResumeController(IResumeParserService resumeParserService, ISkillEx
 
             if (string.IsNullOrWhiteSpace(resumeText))
             {
-                return BadRequest("Could not extract text from the provideddocument.");
+                return BadRequest("Could not extract text from the provided document.");
             }
 
-            var skills = await skillExtractorService.ExtractSkillAsync(resumeText);
+            var extractedData = await skillExtractorService.ExtractSkillsAndMetadataAsync(resumeText);
 
-            return Ok(new
-            {
-                FileName = file.FileName,
-                ExtractSkills = skills
-            });
+            var response = new ResumeExtractionResponse(
+                FileName: file.FileName,
+                ExtractedSkills: [.. extractedData.ExtractedSkills.Select(s => s.SkillName)],
+                TotalSkillsFound: extractedData.ExtractedSkills.Count
+            );
+
+            return Ok(response);
         }
         catch (NotSupportedException ex)
         {

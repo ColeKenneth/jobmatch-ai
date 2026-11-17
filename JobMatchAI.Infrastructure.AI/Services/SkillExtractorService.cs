@@ -1,59 +1,75 @@
+using JobMatchAI.Application.DTOs;
 using JobMatchAI.Application.Services.Interfaces;
-using Microsoft.Extensions.Configuration;
 using Microsoft.SemanticKernel;
-using Newtonsoft.Json;
-using JsonSerializer = System.Text.Json.JsonSerializer;
+using Microsoft.SemanticKernel.ChatCompletion;
+using System.Text.Json;
 
 namespace JobMatchAI.Infrastructure.AI.Services;
 
-public class SkillExtractorService : ISkillExtractorService
+public class SkillExtractorService(Kernel kernel) : ISkillExtractorService
 {
-    private readonly Kernel _kernel;
-    
-    public SkillExtractorService(IConfiguration config)
+    public async Task<ExtractedResumeDataDto> ExtractSkillsAndMetadataAsync(string resumePlainText, CancellationToken ct = default)
     {
-        var builder = Kernel.CreateBuilder();
-
-        builder.AddGoogleAIGeminiChatCompletion(
-            modelId: config["AI:ModelId"] ?? "gemini-1.5-flash",
-            apiKey: config["AI:ApiKey"]!
-        );
+        var chatService = kernel.GetRequiredService<IChatCompletionService>();
         
-        _kernel =  builder.Build();
-    }
+        var dynamicCurrentYear = DateTime.UtcNow.Year;
+        var chatHistory = new ChatHistory();
 
-    public async Task<List<string>> ExtractSkillAsync(string resumeText)
-    {
-        var prompt = $"""
-                      You are an expert professional recruiter and career analyst.
-                      Read the following resume text and extract a comprehensive list of professional competencies, technical skills,
-                      software, tools, domain expertise, and certifications. Include relevant hard skills and industry-specific
-                      proficiencies, but DO NOT include generic soft skills (like "teamwork", "hardworking", or "communication").
-                      Return ONLY a valid JSON array of strings. NO MARKDOWN formatting, NO EXTRA TEXT.
+        var systemPrompt = """
+            You are an advanced AI career intelligence parser for a Philippine higher education institution. 
+            Your task is to analyze unstructured resume text across any discipline (Information Technology, Business Administration, Allied Health, Engineering, etc.) for both current students and alumni.
+            
+            Extract the structured data below and return ONLY valid JSON matching this schema:
+            {{
+              "gwa": 0.0,
+              "graduationYear": {dynamicCurrentYear},
+              "degreeProgram": "string",
+              "extractedSkills": [
+                {{
+                  "skillName": "string",
+                  "category": "string",
+                  "proficiencyLevel": 3
+                }}
+              ],
+              "certificationCount": 0,
+              "internshipCount": 0
+            }}
+            
+            Guidelines:
+            - Extract the actual 4-digit graduation year found in the resume. If multiple degrees exist, use the most recent one. If none found, set to 0.
+            - Normalize skill names (e.g., "MS Excel" -> "Microsoft Excel", "JS" -> "JavaScript").
+            - Estimate a proficiency level from 1 to 5 based on context (years of experience, project complexity, or role seniority).
+            - If GWA is not explicitly found, set it to 0.0.
+            - Accurately count total distinct certifications and internships listed.
+            """;
 
-                      Example Output (Tech): ["C#", "ASP.NET Core", "PostgreSQL", "Kafka"]
-                      Example Output (Non-tech): ["Financial Analysis", "SAP ERP", "Tax Compliance", "Microsoft Office", "Auditing"]
+        systemPrompt = systemPrompt.Replace("{dynamicCurrentYear}", dynamicCurrentYear.ToString());
 
-                      Resume:
-                      {resumeText}
-                      """;
+        chatHistory.AddSystemMessage(systemPrompt);
+        chatHistory.AddUserMessage($"Here is the resume text to analyze:\n\n{resumePlainText}");
 
-        var result = await _kernel.InvokePromptAsync(prompt);
-        var responseText = result.ToString().Trim();
+        var result = await chatService.GetChatMessageContentAsync(chatHistory, cancellationToken: ct);
+        var jsonResponse = result.Content?.Trim() ?? "{}";
 
-        if (responseText.StartsWith("```json"))
+        if (jsonResponse.StartsWith("```json"))
         {
-            responseText = responseText.Replace("```json", "").Replace("```", "").Trim();
+            jsonResponse = jsonResponse.Replace("```json", "").Replace("```", "").Trim();
+        }
+        else if (jsonResponse.StartsWith("```"))
+        {
+            jsonResponse = jsonResponse.Replace("```", "").Trim();
         }
 
         try
         {
-            var skills = JsonSerializer.Deserialize<List<string>>(responseText);
-            return skills ?? [];
+            return JsonSerializer.Deserialize<ExtractedResumeDataDto>(jsonResponse, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            }) ?? new ExtractedResumeDataDto(0.0m, 0, string.Empty, [], 0, 0);
         }
         catch (JsonException)
         {
-            return [];
+            return new ExtractedResumeDataDto(0.0m,  0, string.Empty, [], 0, 0);
         }
     }
 }

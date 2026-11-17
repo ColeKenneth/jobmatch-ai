@@ -1,6 +1,8 @@
+using JobMatchAI.Application.DTOs;
+
 namespace JobMatchAI.Application.Services.Interfaces;
 
 public interface ISkillExtractorService
 {
-    Task<List<string>> ExtractSkillAsync(string resumeText);
+    Task<ExtractedResumeDataDto> ExtractSkillsAndMetadataAsync(string resumePlainText, CancellationToken ct = default);
 }

@@ -11,6 +11,8 @@ using Microsoft.OpenApi;
 using System.Text;
 using JobMatchAI.Infrastructure.AI.Services;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.ML;
+using Microsoft.SemanticKernel;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
@@ -21,7 +23,22 @@ options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")
 
 builder.Services.AddSingleton<IPasswordHasher, Argon2PasswordHasher>();
 builder.Services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+builder.Services.AddSingleton<MLContext>(sp => new MLContext(seed: 42));
+builder.Services.AddSingleton<Kernel>(sp =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    var kernelBuilder = Kernel.CreateBuilder();
+
+    kernelBuilder.AddGoogleAIGeminiChatCompletion(
+        modelId: config["AI:ModelId"] ?? "gemini-1.5-flash",
+        apiKey: config["AI:ApiKey"]!
+    );
+
+    return kernelBuilder.Build();
+});
+
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITransformer>(sp => null!);
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -40,6 +57,8 @@ builder.Services.AddScoped<IMatchResultService, MatchResultService>();
 builder.Services.AddScoped<IPlacementService, PlacementService>();
 builder.Services.AddScoped<IResumeParserService, ResumeParserService>();
 builder.Services.AddScoped<ISkillExtractorService, SkillExtractorService>();
+builder.Services.AddScoped<IResumeService, ResumeService>();
+builder.Services.AddScoped<IMatchingEngineService, MatchingEngineService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

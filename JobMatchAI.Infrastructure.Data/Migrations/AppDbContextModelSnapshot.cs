@@ -58,6 +58,55 @@ namespace JobMatchAI.Infrastructure.Data.Migrations
                     b.ToTable("alumni");
                 });
 
+            modelBuilder.Entity("JobMatchAI.Domain.Entities.CandidateResume", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("file_name");
+
+                    b.Property<string>("RawText")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("raw_text");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("timestamp")
+                        .HasColumnName("uploaded_at");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("candidate_resumes");
+                });
+
+            modelBuilder.Entity("JobMatchAI.Domain.Entities.CandidateSkill", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("CandidateId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("candidate_id");
+
+                    b.Property<string>("SkillName")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("skill_name");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CandidateId");
+
+                    b.ToTable("candidate_skills");
+                });
+
             modelBuilder.Entity("JobMatchAI.Domain.Entities.Certification", b =>
                 {
                     b.Property<Guid>("Id")
@@ -687,6 +736,17 @@ namespace JobMatchAI.Infrastructure.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("JobMatchAI.Domain.Entities.CandidateSkill", b =>
+                {
+                    b.HasOne("JobMatchAI.Domain.Entities.CandidateResume", "CandidateResume")
+                        .WithMany("Skills")
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CandidateResume");
+                });
+
             modelBuilder.Entity("JobMatchAI.Domain.Entities.Certification", b =>
                 {
                     b.HasOne("JobMatchAI.Domain.Entities.Student", "Student")
@@ -851,6 +911,11 @@ namespace JobMatchAI.Infrastructure.Data.Migrations
                 {
                     b.Navigation("EmploymentHistory");
 
+                    b.Navigation("Skills");
+                });
+
+            modelBuilder.Entity("JobMatchAI.Domain.Entities.CandidateResume", b =>
+                {
                     b.Navigation("Skills");
                 });
 

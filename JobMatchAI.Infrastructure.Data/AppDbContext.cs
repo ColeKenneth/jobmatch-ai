@@ -19,6 +19,8 @@ namespace JobMatchAI.Infrastructure.Data
         public virtual DbSet<MatchResult> MatchResults => Set<MatchResult>();
         public virtual DbSet<PlacementRecord> PlacementRecords => Set<PlacementRecord>();
         public virtual DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+        public virtual DbSet<CandidateResume> CandidateResumes => Set<CandidateResume>();
+        public virtual DbSet<CandidateSkill> CandidateSkills => Set<CandidateSkill>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -182,6 +184,26 @@ namespace JobMatchAI.Infrastructure.Data
                 .WithMany()
                 .HasForeignKey(rt => rt.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<CandidateResume>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasMany(cr => cr.Skills)
+                    .WithOne(s => s.CandidateResume)
+                    .HasForeignKey(s => s.CandidateId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<CandidateSkill>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasOne(s => s.CandidateResume)
+                    .WithMany(r => r.Skills)
+                    .HasForeignKey(s => s.CandidateId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }
