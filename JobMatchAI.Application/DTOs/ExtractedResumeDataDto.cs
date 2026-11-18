@@ -4,7 +4,7 @@ public record ExtractedResumeDataDto(
     decimal Gwa,
     int GraduationYear,
     string DegreeProgram,
-    List<ExtractedSkillDto> ExtractedSkills,
+    IReadOnlyList<ExtractedSkillDto> ExtractedSkills,
     int CertificationCount,
     int InternshipCount
     );

@@ -10,6 +10,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
 using JobMatchAI.Infrastructure.AI.Services;
+using ManagedCode.Presidio.Analyzer;
+using ManagedCode.Presidio.Anonymizer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.ML;
 using Microsoft.SemanticKernel;
@@ -37,6 +39,13 @@ builder.Services.AddSingleton<Kernel>(sp =>
     return kernelBuilder.Build();
 });
 
+builder.Services.AddSingleton<ICandidateRankingService>(provider =>
+    new CandidateRankingService(Path.Combine(AppContext.BaseDirectory, "MLModels", "candidateRankingModel.zip")));
+
+builder.Services.AddSingleton<AnalyzerEngine>();
+builder.Services.AddSingleton<AnonymizerEngine>();
+builder.Services.AddSingleton<IAnonymizationService, AnonymizationService>();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITransformer>(sp => null!);
 
@@ -59,6 +68,8 @@ builder.Services.AddScoped<IResumeParserService, ResumeParserService>();
 builder.Services.AddScoped<ISkillExtractorService, SkillExtractorService>();
 builder.Services.AddScoped<IResumeService, ResumeService>();
 builder.Services.AddScoped<IMatchingEngineService, MatchingEngineService>();
+builder.Services.AddScoped<ICandidateScoringService, CandidateScoringService>();
+builder.Services.AddScoped<ICandidateRankingService, CandidateRankingService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

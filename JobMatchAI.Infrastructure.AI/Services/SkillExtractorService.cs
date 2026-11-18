@@ -2,6 +2,7 @@ using JobMatchAI.Application.DTOs;
 using JobMatchAI.Application.Services.Interfaces;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.Google;
 using System.Text.Json;
 
 namespace JobMatchAI.Infrastructure.AI.Services;
@@ -48,28 +49,28 @@ public class SkillExtractorService(Kernel kernel) : ISkillExtractorService
         chatHistory.AddSystemMessage(systemPrompt);
         chatHistory.AddUserMessage($"Here is the resume text to analyze:\n\n{resumePlainText}");
 
-        var result = await chatService.GetChatMessageContentAsync(chatHistory, cancellationToken: ct);
-        var jsonResponse = result.Content?.Trim() ?? "{}";
+        var executionSettings = new GeminiPromptExecutionSettings
+        {
+            ResponseMimeType = "application/json",
+            Temperature = 0.1f
+        };
 
-        if (jsonResponse.StartsWith("```json"))
+        var result = await chatService.GetChatMessageContentAsync(
+            chatHistory,
+            executionSettings,
+            kernel,
+            ct
+        );
+
+        var extractedData = JsonSerializer.Deserialize<ExtractedResumeDataDto>(
+            result.Content!,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+        if (extractedData is null)
         {
-            jsonResponse = jsonResponse.Replace("```json", "").Replace("```", "").Trim();
-        }
-        else if (jsonResponse.StartsWith("```"))
-        {
-            jsonResponse = jsonResponse.Replace("```", "").Trim();
+            throw new InvalidOperationException("AI returned null despite JSON mode being enabled.");
         }
 
-        try
-        {
-            return JsonSerializer.Deserialize<ExtractedResumeDataDto>(jsonResponse, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            }) ?? new ExtractedResumeDataDto(0.0m, 0, string.Empty, [], 0, 0);
-        }
-        catch (JsonException)
-        {
-            return new ExtractedResumeDataDto(0.0m,  0, string.Empty, [], 0, 0);
-        }
+        return extractedData;
     }
 }
