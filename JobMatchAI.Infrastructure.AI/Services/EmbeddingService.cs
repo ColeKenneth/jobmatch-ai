@@ -9,6 +9,7 @@ public sealed class EmbeddingService : IEmbeddingService, IDisposable
     private readonly InferenceSession _session;
     private readonly BertTokenizer _tokenizer;
     private const int MaxSequenceLength = 256;
+    private const int EmbeddingDimensions = 384;
 
     public EmbeddingService(string modelPath, string vocabPath)
     {
@@ -17,6 +18,10 @@ public sealed class EmbeddingService : IEmbeddingService, IDisposable
             throw new FileNotFoundException($"ONNX Model not found at:  {modelPath}");
         }
 
+        if (!File.Exists(vocabPath))
+        {
+            throw new FileNotFoundException($"Vocabulary file not found at: {vocabPath}");
+        }
         _session = new InferenceSession(modelPath);
         _tokenizer = BertTokenizer.Create(vocabPath);
     }
@@ -26,11 +31,16 @@ public sealed class EmbeddingService : IEmbeddingService, IDisposable
     {
         if (string.IsNullOrWhiteSpace(text))
         {
-            return new float[384];
+            return new float[EmbeddingDimensions];
         }
 
         var encoded = _tokenizer.EncodeToIds(text);
         var inputIds = encoded.Take(MaxSequenceLength).Select(id => (long)id).ToArray();
+
+        if (inputIds.Length == 0)
+        {
+            return new float[EmbeddingDimensions];
+        }
         var attentionMask = Enumerable.Repeat(1L, inputIds.Length).ToArray();
         var tokenTypeIds = new long[inputIds.Length];
 
@@ -49,41 +59,72 @@ public sealed class EmbeddingService : IEmbeddingService, IDisposable
         using var results = _session.Run(inputs);
         var tensor = results.First(r => r.Value is DenseTensor<float>).AsTensor<float>();
 
-        return MeanPooling(tensor, attentionMask);
+        var pooled = MeanPooling(tensor, attentionMask);
+        return NormalizeL2(pooled);
     }
 
     public Task<float[]> GenerateEmbeddingsAsync(string text, CancellationToken ct = default)
     {
-        return Task.Run(() => GenerateEmbeddings(text), ct);
+        ct.ThrowIfCancellationRequested();
+        return Task.Run(() =>
+        {
+            ct.ThrowIfCancellationRequested();
+            return GenerateEmbeddings(text);
+        }, ct);
     }
 
     private static float[] MeanPooling(Tensor<float> outputTensor, long[] attentionMask)
     {
-        const int dimensions = 384;
-        var embedding = new float[dimensions];
-        var maskSum = attentionMask.Sum();
+        var embedding = new float[EmbeddingDimensions];
+        var seqLength = Math.Min(outputTensor.Dimensions[1], attentionMask.Length);
+        var dims = Math.Min(outputTensor.Dimensions[2], EmbeddingDimensions);
+
+        long maskSum = 0;
+
+        for (var i = 0; i < seqLength; i++)
+        {
+            if (attentionMask[i] != 1)
+            {
+                continue;
+            }
+
+            maskSum++;
+            for (var j = 0; j < dims; j++)
+            {
+                embedding[j] += outputTensor[0, i, j];
+            }
+        }
 
         if (maskSum == 0)
         {
             return embedding;
         }
 
-        for (var i = 0; i < outputTensor.Dimensions[1]; i++)
-        {
-            var mask = attentionMask[i];
-            if (mask != 1) continue;
-            for (var j = 0; j < dimensions; j++)
-            {
-                embedding[i] += outputTensor[0, i, j];
-            }
-        }
-
-        for (var j = 0; j < dimensions; j++)
+        for (var j = 0; j < dims; j++)
         {
             embedding[j] /= maskSum;
         }
 
         return embedding;
+    }
+
+    private static float[] NormalizeL2(float[] vector)
+    {
+        var sumSquares = vector.Sum(t => (double)t * t);
+
+        var norm = Math.Sqrt(sumSquares);
+        if (norm <= 1e-12)
+        {
+            return vector;
+        }
+        
+        var normalized = new float[vector.Length];
+        for (var i = 0; i < vector.Length; i++)
+        {
+            normalized[i] = (float)(vector[i] / norm);
+        }
+
+        return normalized;
     }
 
     public void Dispose()

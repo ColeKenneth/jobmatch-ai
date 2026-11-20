@@ -7,10 +7,11 @@ using System.Text.Json;
 
 namespace JobMatchAI.Infrastructure.AI.Services;
 
-public class SkillExtractorService(Kernel kernel) : ISkillExtractorService
+public class SkillExtractorService(Kernel kernel, IAnonymizationService anonymizationService) : ISkillExtractorService
 {
     public async Task<ExtractedResumeDataDto> ExtractSkillsAndMetadataAsync(string resumePlainText, CancellationToken ct = default)
     {
+        var scrubbedResumeText = anonymizationService.ScrubPii(resumePlainText);
         var chatService = kernel.GetRequiredService<IChatCompletionService>();
         
         var dynamicCurrentYear = DateTime.UtcNow.Year;
@@ -47,7 +48,7 @@ public class SkillExtractorService(Kernel kernel) : ISkillExtractorService
         systemPrompt = systemPrompt.Replace("{dynamicCurrentYear}", dynamicCurrentYear.ToString());
 
         chatHistory.AddSystemMessage(systemPrompt);
-        chatHistory.AddUserMessage($"Here is the resume text to analyze:\n\n{resumePlainText}");
+        chatHistory.AddUserMessage($"Here is the resume text to analyze:\n\n{scrubbedResumeText}");
 
         var executionSettings = new GeminiPromptExecutionSettings
         {
@@ -66,11 +67,6 @@ public class SkillExtractorService(Kernel kernel) : ISkillExtractorService
             result.Content!,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-        if (extractedData is null)
-        {
-            throw new InvalidOperationException("AI returned null despite JSON mode being enabled.");
-        }
-
-        return extractedData;
+        return extractedData ?? throw new InvalidOperationException("AI returned null despite JSON mode being enabled.");
     }
 }
